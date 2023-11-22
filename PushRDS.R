@@ -6,8 +6,8 @@ Sys.setenv(
   "AWS_DEFAULT_REGION" = "us-east-1"
 )
 
-list_files = list.files('../bsts_T-11-17-2023', full.names = TRUE)
-file_names = list.files('../bsts_T-11-17-2023')
+list_files = list.files('E:/bsts_T-11-22-2023', full.names = TRUE)
+file_names = list.files('E:/bsts_T-11-22-2023')
 
 for(i in 1:length(list_files)){
   

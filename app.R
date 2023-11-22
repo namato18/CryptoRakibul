@@ -524,6 +524,7 @@ ui <- secure_app(
                              selectInput("selectTypeWeek", "Pick Which Type to Predict", choices = list("Crypto" = "Crypto")),
                              selectInput('selectTimeFrame', 'Pick a Timeframe', choices = list("15 mins" = "15min",
                                                                                                "30 mins" = "30min",
+                                                                                               "45 mins" = "45min",
                                                                                                "1 hour" = "1hour",
                                                                                                "4 hour" = "4hour",
                                                                                                '7 Days' = 'daily',

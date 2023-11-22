@@ -1013,6 +1013,13 @@ predict_week = function(symbol, timeframe,type){
                           high = NA,
                           low = NA,
                           close = NA)
+  }else if(timeframe == "45min"){
+    data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "45 mins")), ymd_hms(Sys.time()) + lubridate::hours(20), by = '45 mins')[1:7],
+                          open = NA,
+                          high = NA,
+                          low = NA,
+                          close = NA)
+    
   }else if(timeframe == "15min"){
     data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "15 mins")), ymd_hms(Sys.time()) + lubridate::hours(3), by = '15 mins')[1:7],
                           open = NA,

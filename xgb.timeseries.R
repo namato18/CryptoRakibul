@@ -7,6 +7,7 @@ library(stringr)
 library(quantmod)
 library(CandleStickPattern)
 library(riingo)
+library(purrr)
 
 possibly_riingo_crypto_prices = possibly(riingo_crypto_prices, otherwise = "ERROR")
 
@@ -18,7 +19,7 @@ str2 = unique(str2)
 
 # str2 = readRDS('tickers/str2')
 # checkbox_list = setNames(str2, str1)
-timeframe = c("15min",'30min',"1hour","4hour")
+timeframe = c("45min")
 days.back = 90
 
 for(j in 1:length(str2)){
@@ -73,6 +74,13 @@ for(j in 1:length(str2)){
     
     if(timeframe[i] == "15min"){
       data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "15 mins")), ymd_hms(Sys.time()) + lubridate::hours(3), by = '15 mins')[2:8],
+                            open = NA,
+                            high = NA,
+                            low = NA,
+                            close = NA)
+      
+    }else if(timeframe[i] == "45min"){
+      data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "45 mins")), ymd_hms(Sys.time()) + lubridate::hours(20), by = '45 mins')[2:8],
                             open = NA,
                             high = NA,
                             low = NA,
@@ -220,7 +228,7 @@ for(j in 1:length(str2)){
     
     # bst = readRDS(paste0('bsts_T/bst_T_',symbol,'.rds'))
     
-    saveRDS(bst, paste0('C:/Users/xbox/Desktop/Rstuff/bsts_T-11-17-2023/bst_T_',symbol,timeframe[i],'.rds'))
+    saveRDS(bst, paste0('E:/bsts_T-11-22-2023/bst_T_',symbol,timeframe[i],'.rds'))
   }
   print(symbol)
 }
