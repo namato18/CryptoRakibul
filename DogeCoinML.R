@@ -2733,9 +2733,8 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   
   df = possibly_riingo_crypto_prices(ticker = coin,
                                      start_date = start.date,
-                                     end_date = as.Date(end.date) + 1,
-                                     resample_frequency = timeframe,
-                                     exchanges = "binance")
+                                     end_date = as.Date(end.date),
+                                     resample_frequency = timeframe)
   
   bst = s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/TiingoBoosts"),
                      object = paste0("bst_",coin,"_",timeframe,target.percentage,".rds"))
@@ -2855,26 +2854,46 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   
   df.purchases$confidence = confidence.scores
   df.purchases$OH = round((df.purchases$High - df.purchases$Open) / df.purchases$Open * 100, 3)
+  df.purchases$OL = round((df.purchases$Low - df.purchases$Open) / df.purchases$Open * 100, 3)
   df.purchases$OC = round((df.purchases$Close - df.purchases$Open) / df.purchases$Open * 100, 3)
   df.purchases$Target = target.percentage
   
   df.purchases = na.omit(df.purchases)
   
   df.purchases$PL = 0
+  
+  if(target.percentage > 0){
   df.purchases$PL[df.purchases$OH >= df.purchases$Target] = df.purchases$Target[df.purchases$OH >= df.purchases$Target]
   df.purchases$PL[df.purchases$OH < df.purchases$Target] = df.purchases$OC[df.purchases$OH < df.purchases$Target]
   # df.purchases$PL[df.purchases$PL < (target.percentage*-2.5)] = (target.percentage*-2.5)
+  }else{
+    df.purchases$PL[df.purchases$OL <= df.purchases$Target] = df.purchases$Target[df.purchases$OL >= df.purchases$Target]
+    df.purchases$PL[df.purchases$OL > df.purchases$Target] = df.purchases$OC[df.purchases$OL > df.purchases$Target]
+  }
+  
   
   numeric_cols = sapply(df.purchases, is.numeric)
   df.purchases[numeric_cols] = lapply(df.purchases[numeric_cols], signif, digits = 6)
   
-  assign("DF.PURCHASES", df.purchases, .GlobalEnv)
-  
+
   true.pos = length(which(df.purchases$PL == target.percentage))
   false.pos = nrow(df.purchases) - true.pos
+  if(target.percentage > 0){
   false.neg = length(which(round((df.ohlc$High - df.ohlc$Open) / df.ohlc$Open * 100, 3)  >= target.percentage)) - true.pos
+  }else{
+    false.neg = length(which(round((df.ohlc$Low - df.ohlc$Open) / df.ohlc$Open * 100, 3)  <= target.percentage)) - true.pos
+  }
   assign('compare', df.ohlc, .GlobalEnv)
+  # compare = df.ohlc
+  # df.purchases = df.purchases
+  
+  if(target.percentage < 0){
+    df.purchases$PL = df.purchases$PL * -1
+  }
   assign('df.purchases',df.purchases,.GlobalEnv)
+  
+  # df.purchases$PL[df.purchases$PL < (target.percentage*-2.5)] = (target.percentage*-2.5)
+  
   
   profitable.trades = length(which(as.numeric(df.purchases$PL) > 0))
   
@@ -2886,28 +2905,35 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   recall = round(recall, digits = 4)
   f1 = round(f1, digits = 4)
   
-  assign("precision",precision,.GlobalEnv)
-  assign("recall",recall,.GlobalEnv)
-  assign("f1",f1,.GlobalEnv)
+  # assign("precision",precision,.GlobalEnv)
+  # assign("recall",recall,.GlobalEnv)
+  # assign("f1",f1,.GlobalEnv)
   
   PL = sum(df.purchases$PL)
   
   df.purchases$OH = paste0(df.purchases$OH, " %")
   df.purchases$OC = paste0(df.purchases$OC, " %")
+  df.purchases$OL = paste0(df.purchases$OL, " %")
   df.purchases$Target = paste0(df.purchases$Target, " %")
   df.purchases$PL = paste0(df.purchases$PL, " %")
   
-  colnames(df.purchases) = c("Open", "High", "Low", "Close", "Coin", "Time (UTC)", "Confidence Scores", "Open/High", "Open/Close", "Target", "PL")
+  colnames(df.purchases) = c("Open", "High", "Low", "Close", "Coin", "Time (UTC)", "Confidence Scores", "Open/High","Open/Low", "Open/Close", "Target", "PL")
   
   fee.to.subtract = fee * nrow(df.purchases) * 2
   PL = PL - fee.to.subtract
   
   assign('sum.percentage',round(PL,3),.GlobalEnv)
+  # sum.percentage = round(PL,3)
   assign('profitable.trades',paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%"), .GlobalEnv)
-  
+  # profitable.trades = paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%")
   print(PL)
   
-  
+  # to.return = list(compare = compare,
+  #                  df.purchases = df.purchases,
+  #                  sum.percentage = sum.percentage,
+  #                  profitable.trades = profitable.trades)
+  # 
+  # return(to.return)
   # to.return = list(df.purchases = df.purchases,
   #                  PL = PL)
   # 

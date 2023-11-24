@@ -240,19 +240,20 @@ ui <- secure_app(
                              br(),
                              br()
                          ),
-                         box(title = "Histogram", width = NULL, status = "primary", solidHeader = TRUE,
-                             paste0("Ideally, we'd like there to be a near 0 probability or a near 1 probability for all predictions. ",
-                                    "Values that are more in the middle can give us an unclear prediction."),
-                             plotOutput("modelPlot")
-                         ),
-                         box(title = "Sentiment Backtest Metrics", width = NULL, status = "primary", solidHeader = TRUE,
-                             valueBoxOutput(outputId = "precisionBoxSentiment", width = 12),
-                             # valueBoxOutput(outputId = "recallBox", width = 6),
-                             # valueBoxOutput(outputId = "f1Box", width = 4),
-                             valueBoxOutput(outputId = "totalDataSentiment", width = 6),
-                             valueBoxOutput(outputId = "predictedHitsSentiment", width = 6)
-                             
-                         )
+
+                         # box(title = "Histogram", width = NULL, status = "primary", solidHeader = TRUE,
+                         #     paste0("Ideally, we'd like there to be a near 0 probability or a near 1 probability for all predictions. ",
+                         #            "Values that are more in the middle can give us an unclear prediction."),
+                         #     plotOutput("modelPlot")
+                         # ),
+                         # box(title = "Sentiment Backtest Metrics", width = NULL, status = "primary", solidHeader = TRUE,
+                         #     valueBoxOutput(outputId = "precisionBoxSentiment", width = 12),
+                         #     # valueBoxOutput(outputId = "recallBox", width = 6),
+                         #     # valueBoxOutput(outputId = "f1Box", width = 4),
+                         #     valueBoxOutput(outputId = "totalDataSentiment", width = 6),
+                         #     valueBoxOutput(outputId = "predictedHitsSentiment", width = 6)
+                         #     
+                         # )
                          # box(title = "Metrics", width = NULL, status = "primary", solidHeader = TRUE,
                          #   # infoBoxOutput("OverallAccuracy", width = 6),
                          #   infoBoxOutput("Buy", width = 6),
@@ -264,23 +265,23 @@ ui <- secure_app(
                          # ),
                   ),
                   column(width = 6,
-                         box(title = "Metric Descriptions", width = NULL, status = "primary", solidHeader = TRUE,
-                             strong("Precision: "),paste0("A measure of how accurate the model is at hitting it's target when it gives a buy signal.",
-                                                          " The equation goes as: (true positives) / (true positives + false positives)"),
-                             br(),
-                             br(),
-                             # strong("Recall: "),paste0("A measure of what percentage of buy signals WERE classified correctly compared to how many SHOULD have been classified as a buy signal",
-                             #                           " The equation goes as: (true positives) / (true positives + false negatives)"),
-                             # br(),
-                             # br(),
-                             # strong("F1 Score: "),paste0("A value from 0 to 1, 1 being the model classifies every observation correctly. The equation goes as: 2 * (precision * recall) / (precision + recall)"),
-                             # br(),
-                             # br(),
-                             strong("Number of Candles Backtested: "), paste0("The amount of historical data that has been tested for the selected time period"),
-                             br(),
-                             br(),
-                             strong("Predicted Buy Signals: "), paste0("How many times did the model predict a buy signal on the backtested data")
-                         ),
+                         # box(title = "Metric Descriptions", width = NULL, status = "primary", solidHeader = TRUE,
+                         #     strong("Precision: "),paste0("A measure of how accurate the model is at hitting it's target when it gives a buy signal.",
+                         #                                  " The equation goes as: (true positives) / (true positives + false positives)"),
+                         #     br(),
+                         #     br(),
+                         #     # strong("Recall: "),paste0("A measure of what percentage of buy signals WERE classified correctly compared to how many SHOULD have been classified as a buy signal",
+                         #     #                           " The equation goes as: (true positives) / (true positives + false negatives)"),
+                         #     # br(),
+                         #     # br(),
+                         #     # strong("F1 Score: "),paste0("A value from 0 to 1, 1 being the model classifies every observation correctly. The equation goes as: 2 * (precision * recall) / (precision + recall)"),
+                         #     # br(),
+                         #     # br(),
+                         #     strong("Number of Candles Backtested: "), paste0("The amount of historical data that has been tested for the selected time period"),
+                         #     br(),
+                         #     br(),
+                         #     strong("Predicted Buy Signals: "), paste0("How many times did the model predict a buy signal on the backtested data")
+                         # ),
                          box(title = "Metrics", width = NULL, status = "primary", solidHeader = TRUE,
                              # valueBoxOutput(outputId = "precisionBox", width = 12),
                              # valueBoxOutput(outputId = "recallBox", width = 6),
@@ -290,33 +291,36 @@ ui <- secure_app(
                              valueBoxOutput(outputId = "totalData", width = 6),
                              valueBoxOutput(outputId = "predictedHits", width = 6)
                              
-                         ),
-                         box(width = NULL, title = "Backtest", status = "primary", solidHeader = TRUE,
-                             strong(h4("Variable Info:")),
-                             strong('Actual:'),
-                             paste0("If the next candle actually hit the target percentage increase, this will be 'HIT TARGET', otherwise 'MISSED TARGET'. ",
-                                    "The color will be GREEN if a profit could have been made and RED if a loss could have been made."),
-                             br(),
-                             strong("Actual High:"),
-                             paste0("This was the next candles high"),
-                             br(),
-                             strong("Actual Low:"),
-                             paste0("This was the next candles low"),
-                             br(),
-                             strong("Actual Close:"),
-                             paste0("This was the next candles close"),
-                             br(),
-                             strong("Confidence Score:"),
-                             paste0("This is the confidence the model has that the next candle would reach the target percentage increase (on a scale of 0 to 1)"),
-                             br(),
-                             strong("Signal:"),
-                             paste0("If the 'Confidence Score' is higher than the selected prediction BUY threshold, this will be 'DID BUY', otherwise 'DIDN'T BUY'"),
-                             br(),
-                             br(),
-                             dataTableOutput("table1")
                          )
+                         # box(width = NULL, title = "Backtest", status = "primary", solidHeader = TRUE,
+                         #     strong(h4("Variable Info:")),
+                         #     strong('Actual:'),
+                         #     paste0("If the next candle actually hit the target percentage increase, this will be 'HIT TARGET', otherwise 'MISSED TARGET'. ",
+                         #            "The color will be GREEN if a profit could have been made and RED if a loss could have been made."),
+                         #     br(),
+                         #     strong("Actual High:"),
+                         #     paste0("This was the next candles high"),
+                         #     br(),
+                         #     strong("Actual Low:"),
+                         #     paste0("This was the next candles low"),
+                         #     br(),
+                         #     strong("Actual Close:"),
+                         #     paste0("This was the next candles close"),
+                         #     br(),
+                         #     strong("Confidence Score:"),
+                         #     paste0("This is the confidence the model has that the next candle would reach the target percentage increase (on a scale of 0 to 1)"),
+                         #     br(),
+                         #     strong("Signal:"),
+                         #     paste0("If the 'Confidence Score' is higher than the selected prediction BUY threshold, this will be 'DID BUY', otherwise 'DIDN'T BUY'"),
+                         #     br(),
+                         #     br(),
+                         #     dataTableOutput("table1")
+                         # )
 
                          
+                  ),
+                  box(title = "Trades Made", status = "primary", solidHeader = TRUE, width = 12,
+                      dataTableOutput("tradesMadeTable")
                   )
                   
                   
@@ -362,6 +366,8 @@ ui <- secure_app(
                       #                    choices = checkbox_list,
                       #                    selected = 'btcusd'),
                       selectInput("timeframePredict","Pick a Timeframe", choices = list("15 Minutes" = "15min",
+                                                                                        "30 Minutes" = "30min",
+                                                                                        "45 Minutes" = "45min",
                                                                                         "1 Hour" = "1hour",
                                                                                         "4 Hour" = "4hour",
                                                                                         "8 Hour" = "8hour",
@@ -732,7 +738,10 @@ ui <- secure_app(
                       paste0("This tab allows you to start and stop automation. Use the inputs to set up your automation criteria."),
                   ),
                   box(title = "Inputs", status = "primary", solidHeader = TRUE,width=4,
-                      selectInput("timeframeAutomation","Pick a Timeframe to Automate", choices = list("1 Hour" = "1hour",
+                      selectInput("timeframeAutomation","Pick a Timeframe to Automate", choices = list("15 min" = "15min",
+                                                                                                       "30 min" = "30min",
+                                                                                                       "45 min" = "45min",
+                                                                                                       "1 Hour" = "1hour",
                                                                                                        "4 Hour" = "4hour",
                                                                                                        "8 Hour" = "8hour",
                                                                                                        "1 day" = "1day")),
@@ -1002,10 +1011,13 @@ server <- function(input, output, session) {
     if(input$slider1 == 0){
       
     }else{
-      BacktestSelected(input$select, input$slider1,input$timeframe, input$slider2, input$dateRangeOverview)
+      x = BacktestSelected(input$select, input$slider1,input$timeframe, input$slider2, input$dateRangeOverview)
+      assign("x",x,.GlobalEnv)
       # createModel(input$selectType,input$slider1, input$slider2, input$select, input$timeframe, input$slider1)
       senti = BacktestSentiment(input$selectType,input$slider1, input$slider2, input$select, input$timeframe)
     }
+    if(exists("compare")){
+      
     
     # output$precisionBox = renderValueBox({
     #   shinydashboard::valueBox(value = paste0(precision,"%"), subtitle = "Precision Score", icon = icon("bullseye"))
@@ -1061,7 +1073,12 @@ server <- function(input, output, session) {
     # output$table1 = renderDataTable(table1.colored)
     # output$modelPlot = renderPlot(hist(compare$Confidence.Score))
     x = data.frame(confidence.scores)
-    output$modelPlot = renderPlot(ggplot(data = x, aes(x = confidence.scores)) + geom_histogram(colour = "blue", alpha = 0.3))
+    # output$modelPlot = renderPlot(ggplot(data = x, aes(x = confidence.scores)) + geom_histogram(colour = "blue", alpha = 0.3))
+    
+    output$tradesMadeTable = renderDataTable(datatable(df.purchases, style = "bootstrap"))
+    }else{
+      output$tradesMadeTable = NULL
+    }
   })
   
   observeEvent(input$action2, {
@@ -1416,7 +1433,7 @@ server <- function(input, output, session) {
   # 
   observeEvent(input$timeframe,{
     if(input$selectType == "Crypto" | input$selectType == "Stocks"){
-      if(input$timeframe == "15min" | input$timeframe == "1hour"){
+      if(input$timeframe == "15min" | input$timeframe == "1hour" | input$timeframe == "30min" | input$timeframe == "45min"){
         updateSliderInput(inputId = "slider1",label="Select Percentage Increase", min = -1, max = 1, step = 0.1, value = 0.1)
       }else if(input$timeframe == "2hour"){
         updateSliderInput(inputId = "slider1",label="Select Percentage Increase", min =-2, max = 2, step = 0.2, value = 0.2)
