@@ -19,12 +19,12 @@ str2 = unique(str2)
 
 # str2 = readRDS('tickers/str2')
 # checkbox_list = setNames(str2, str1)
-timeframe = c("45min")
+timeframe = c("8hour","12hour")
 days.back = 90
 
 for(j in 1:length(str2)){
   for(i in 1:length(timeframe)){
-    
+
     if(timeframe[i] == "15min"){
       days.back = 45
     }
@@ -115,6 +115,21 @@ for(j in 1:length(str2)){
                             high = NA,
                             low = NA,
                             close = NA)
+    }else if(timeframe == "8hour"){
+      
+      data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "8 hours")), ymd_hms(Sys.time()) + lubridate::hours(150), by = '8 hours')[1:7],
+                            open = NA,
+                            high = NA,
+                            low = NA,
+                            close = NA)
+      
+    }else if(timeframe == "12hour"){
+      data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "12 hour")), ymd_hms(Sys.time()) + lubridate::hours(150), by = '12 hour')[1:7],
+                            open = NA,
+                            high = NA,
+                            low = NA,
+                            close = NA)
+      
     }else{
       data.add = data.frame(time = seq(from = as_date(Sys.Date()),
                                        by = "week", length.out = 7),
@@ -228,7 +243,7 @@ for(j in 1:length(str2)){
     
     # bst = readRDS(paste0('bsts_T/bst_T_',symbol,'.rds'))
     
-    saveRDS(bst, paste0('E:/bsts_T-11-22-2023/bst_T_',symbol,timeframe[i],'.rds'))
+    saveRDS(bst, paste0('E:/bsts_T-11-26-2023/bst_T_',symbol,timeframe[i],'.rds'))
   }
   print(symbol)
 }

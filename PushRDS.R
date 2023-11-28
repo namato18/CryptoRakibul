@@ -6,8 +6,13 @@ Sys.setenv(
   "AWS_DEFAULT_REGION" = "us-east-1"
 )
 
-list_files = list.files('E:/bsts_T-11-22-2023', full.names = TRUE)
-file_names = list.files('E:/bsts_T-11-22-2023')
+list_files = list.files('E:/bsts_T-11-26-2023', full.names = TRUE)
+file_names = list.files('E:/bsts_T-11-26-2023')
+
+# ind = grep(pattern = "BreakL", x = file_names)
+# 
+# list_files = list_files[ind]
+# file_names = file_names[ind]
 
 for(i in 1:length(list_files)){
   

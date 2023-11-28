@@ -1,5 +1,6 @@
 library(shiny)
 library(shinydashboard)
+# library(shinydashboardPlus)
 library(dashboardthemes)
 library(ggplot2)
 library(DT)
@@ -140,7 +141,8 @@ ui <- secure_app(
                         # menuItem("", tabName = 'alphaVantageBacktest', icon = icon('calendar')),
                         menuItem("", tabName = "forexFactoryBacktest", icon = icon('calendar')),
                         menuItem("", tabName = "automation", icon = icon("robot")),
-                        menuItem("", tabName = "chat", icon = icon("comments"))
+                        menuItem("", tabName = "chat", icon = icon("comments")),
+                        menuItem("", tabName = "newsFeed", icon = icon('people-group'))
                         # menuItem("", tabName = "etherscan", icon = icon("searchengin"))
                       )
                     )
@@ -180,6 +182,8 @@ ui <- secure_app(
                 fluidPage(
                   shinyjs::useShinyjs(),
                   tags$head(tags$style('body {color:white;}')),
+                  tags$head(tags$style('h3 {color:white;}')),
+                  tags$head(tags$style('.box-header.with-border {color:white;}')),
                   tags$head(tags$style('label {color:white;}')),
                   tags$head(tags$style('table {color:white;}')),
                   tags$head(tags$style('form {color:black;}')),
@@ -222,6 +226,7 @@ ui <- secure_app(
                                                                                         "1 Hour" = "1hour",
                                                                                         "4 Hour" = "4hour",
                                                                                         "8 Hour" = "8hour",
+                                                                                        "12 Hour" = "12hour",
                                                                                         "1 Day" = "1day")),
                              selectInput("select","Pick a crypto to predict", choices = checkbox_list),
                              br(),
@@ -240,7 +245,7 @@ ui <- secure_app(
                              br(),
                              br()
                          ),
-
+                         
                          # box(title = "Histogram", width = NULL, status = "primary", solidHeader = TRUE,
                          #     paste0("Ideally, we'd like there to be a near 0 probability or a near 1 probability for all predictions. ",
                          #            "Values that are more in the middle can give us an unclear prediction."),
@@ -316,7 +321,7 @@ ui <- secure_app(
                          #     br(),
                          #     dataTableOutput("table1")
                          # )
-
+                         
                          
                   ),
                   box(title = "Trades Made", status = "primary", solidHeader = TRUE, width = 12,
@@ -371,6 +376,7 @@ ui <- secure_app(
                                                                                         "1 Hour" = "1hour",
                                                                                         "4 Hour" = "4hour",
                                                                                         "8 Hour" = "8hour",
+                                                                                        "12 Hour" = "12hour",
                                                                                         "1 Day" = "1day")),
                       sliderInput("slider3", "Select Prediction 'BUY' Threshold", min = 0.1, max = 1, step = 0.05, value = 0.5),
                       actionButton("action4","Predict"),
@@ -432,41 +438,41 @@ ui <- secure_app(
                   box(title = "Prediction 4", status = "primary", solidHeader = TRUE, width=6,
                       dataTableOutput("multipleOutput4")
                   ),
-                  box(title = "Sentiment Analysis", status = "primary", solidHeader = TRUE, width=12,
-                      strong("NOTE THAT SENTIMENT ANALYSIS ONLY DISPLAYS PREDICTIONS FOR THE 1 DAY TIMEFRAME"),
-                      br(),
-                      br(),
-                      column(width = 6,
-                             valueBoxOutput("fearGreedRating", width = 6),
-                             valueBoxOutput("OneHrSent", width = 6)
-                             ),
-                      column(width = 6,
-                             valueBoxOutput("EightHrSent", width = 6),
-                             valueBoxOutput("TwenFourHrSent", width = 6)
-                             ),
-                      br(),
-                      br(),
-                      
-                      column(width = 6,
-                             box(title = "Sentiment 1", status = "primary", solidHeader = TRUE, width=12,
-                                 dataTableOutput("sentimentOutput1")
-                             ),
-                             box(title = "Sentiment 3", status = "primary", solidHeader = TRUE, width=12,
-                                 dataTableOutput("sentimentOutput3")
-                             )
-                      ),
-                      column(width = 6,
-                             box(title = "Sentiment 2", status = "primary", solidHeader = TRUE, width=12,
-                                 dataTableOutput("sentimentOutput2")
-                             ),
-                             box(title = "Sentiment 4", status = "primary", solidHeader = TRUE, width=12,
-                                 dataTableOutput("sentimentOutput4")
-                             )
-                      )
-                      
-                      
-                      
-                  )
+                  # box(title = "Sentiment Analysis", status = "primary", solidHeader = TRUE, width=12,
+                  #     strong("NOTE THAT SENTIMENT ANALYSIS ONLY DISPLAYS PREDICTIONS FOR THE 1 DAY TIMEFRAME"),
+                  #     br(),
+                  #     br(),
+                  #     column(width = 6,
+                  #            valueBoxOutput("fearGreedRating", width = 6),
+                  #            valueBoxOutput("OneHrSent", width = 6)
+                  #     ),
+                  #     column(width = 6,
+                  #            valueBoxOutput("EightHrSent", width = 6),
+                  #            valueBoxOutput("TwenFourHrSent", width = 6)
+                  #     ),
+                  #     br(),
+                  #     br(),
+                  # 
+                  #     column(width = 6,
+                  #            box(title = "Sentiment 1", status = "primary", solidHeader = TRUE, width=12,
+                  #                dataTableOutput("sentimentOutput1")
+                  #            ),
+                  #            box(title = "Sentiment 3", status = "primary", solidHeader = TRUE, width=12,
+                  #                dataTableOutput("sentimentOutput3")
+                  #            )
+                  #     ),
+                  #     column(width = 6,
+                  #            box(title = "Sentiment 2", status = "primary", solidHeader = TRUE, width=12,
+                  #                dataTableOutput("sentimentOutput2")
+                  #            ),
+                  #            box(title = "Sentiment 4", status = "primary", solidHeader = TRUE, width=12,
+                  #                dataTableOutput("sentimentOutput4")
+                  #            )
+                  #     )
+                  # 
+                  # 
+                  # 
+                  # )
                   
                 )
         ),
@@ -533,6 +539,8 @@ ui <- secure_app(
                                                                                                "45 mins" = "45min",
                                                                                                "1 hour" = "1hour",
                                                                                                "4 hour" = "4hour",
+                                                                                               "8 hour" = "8hour",
+                                                                                               "12 hour" = "12hour",
                                                                                                '7 Days' = 'daily',
                                                                                                '7 Weeks' = 'weekly')),
                              selectInput('selectNextWeek', "Select a Coin", choices = checkbox_list),
@@ -557,56 +565,56 @@ ui <- secure_app(
                 )
         ),
         
-        tabItem(tabName = "binance",
-                fluidRow(
-                  
-                  # img(src='ai3.png', width = 125, height = 125, align = 'right' ),
-                  strong(h1("Binance Integration")),
-                  box(width=10,
-                      paste0("This tab offers you the capability of performing trades on Binance directly through this interface.")
-                  ),
-                  box(title = "Inputs", status = "primary", solidHeader = TRUE,width = 4,
-                      selectInput('selectCoinBinance', "Select a Coin", choices = checkbox_list, selected = 'BTCUSDT'),
-                      br(),
-                      selectInput('selectTypeBinance', 'Market or Limit', choices = list('Market' = 'MARKET',
-                                                                                         "Limit" = 'LIMIT'),
-                                  selected = 'Market'),
-                      br(),
-                      selectInput('selectSideBinance', 'Buy or Sell', choices = list("Buy" = "BUY",
-                                                                                     "Sell" = "SELL"),
-                                  selected = 'Buy'),
-                      br(),
-                      # sliderInput("takeProfitBinance", "Set Take Profit %",min = 0, max = 20, step = 0.1, value = 0),
-                      # br(),
-                      # sliderInput("stopLossBinance", "Set Stop Loss %",min = 0, max = 20, step = 0.1, value = 0),
-                      # br(),
-                      numericInput("tradeQuantity", "Quantity", value = 0, min = 0, step = 0.1),
-                      textOutput('decimalsAllowed'),
-                      br(),
-                      sliderInput('percentSliderBinance', 'Percentage of USDT balance',value = 0,min = 0, max = 100, step = 0.1)
-                  ),
-                  box(title = "Live Price", status = "primary", solidHeader = TRUE,
-                      actionButton(inputId = 'getLivePrice', label = 'Refresh Live Price'),
-                      br(),
-                      br(),
-                      textOutput('livePrice')
-                  ),
-                  box(title = "Spot Account Balances", status = "primary", solidHeader = TRUE, width = 8,
-                      dataTableOutput('spotAccountBalances')
-                  ),
-                  actionBttn(inputId = 'submitBinance',
-                             label = 'Submit',
-                             icon = icon('money-bill-trend-up'),
-                             style = 'pill',
-                             color = 'warning',
-                             size = 'lg',
-                             block = TRUE),
-                  br(),
-                  dataTableOutput('binancePredictionTable')
-                  
-                  
-                )
-        ),
+        # tabItem(tabName = "binance",
+        #         fluidRow(
+        #           
+        #           # img(src='ai3.png', width = 125, height = 125, align = 'right' ),
+        #           strong(h1("Binance Integration")),
+        #           box(width=10,
+        #               paste0("This tab offers you the capability of performing trades on Binance directly through this interface.")
+        #           ),
+        #           box(title = "Inputs", status = "primary", solidHeader = TRUE,width = 4,
+        #               selectInput('selectCoinBinance', "Select a Coin", choices = checkbox_list, selected = 'BTCUSDT'),
+        #               br(),
+        #               selectInput('selectTypeBinance', 'Market or Limit', choices = list('Market' = 'MARKET',
+        #                                                                                  "Limit" = 'LIMIT'),
+        #                           selected = 'Market'),
+        #               br(),
+        #               selectInput('selectSideBinance', 'Buy or Sell', choices = list("Buy" = "BUY",
+        #                                                                              "Sell" = "SELL"),
+        #                           selected = 'Buy'),
+        #               br(),
+        #               # sliderInput("takeProfitBinance", "Set Take Profit %",min = 0, max = 20, step = 0.1, value = 0),
+        #               # br(),
+        #               # sliderInput("stopLossBinance", "Set Stop Loss %",min = 0, max = 20, step = 0.1, value = 0),
+        #               # br(),
+        #               numericInput("tradeQuantity", "Quantity", value = 0, min = 0, step = 0.1),
+        #               textOutput('decimalsAllowed'),
+        #               br(),
+        #               sliderInput('percentSliderBinance', 'Percentage of USDT balance',value = 0,min = 0, max = 100, step = 0.1)
+        #           ),
+        #           box(title = "Live Price", status = "primary", solidHeader = TRUE,
+        #               actionButton(inputId = 'getLivePrice', label = 'Refresh Live Price'),
+        #               br(),
+        #               br(),
+        #               textOutput('livePrice')
+        #           ),
+        #           box(title = "Spot Account Balances", status = "primary", solidHeader = TRUE, width = 8,
+        #               dataTableOutput('spotAccountBalances')
+        #           ),
+        #           actionBttn(inputId = 'submitBinance',
+        #                      label = 'Submit',
+        #                      icon = icon('money-bill-trend-up'),
+        #                      style = 'pill',
+        #                      color = 'warning',
+        #                      size = 'lg',
+        #                      block = TRUE),
+        #           br(),
+        #           dataTableOutput('binancePredictionTable')
+        #           
+        #           
+        #         )
+        # ),
         # tabItem(tabName = "alphaVantageBacktest",
         #         fluidRow(
         #           tags$head(
@@ -744,6 +752,7 @@ ui <- secure_app(
                                                                                                        "1 Hour" = "1hour",
                                                                                                        "4 Hour" = "4hour",
                                                                                                        "8 Hour" = "8hour",
+                                                                                                       "12 Hour" = "12hour",
                                                                                                        "1 day" = "1day")),
                       br(),
                       selectInput('checkGroupBinance',label = 'Select Coin(s) to Automate', choices = checkbox_list, multiple = FALSE, selected = 'BTCUSDT'),
@@ -767,6 +776,12 @@ ui <- secure_app(
                                  block = TRUE)
                       
                   ),
+                  box(title = "Live Price", status = "primary", solidHeader = TRUE,
+                      # actionButton(inputId = 'getLivePrice', label = 'Refresh Live Price'),
+                      # br(),
+                      # br(),
+                      textOutput('livePrice')
+                  ),
                   box(title = "Spot Account Balances", status = "primary", solidHeader = TRUE,width = 8,
                       dataTableOutput('spotAccountBalancesAutomation')
                   ),
@@ -788,7 +803,8 @@ ui <- secure_app(
                   box(title = "Short Term Backtesting", status = "primary", solidHeader = TRUE,width=12,
                       selectInput(inputId = "shortBacktestTimeframe",label = "Please Select a Timeframe", choices = list("1 week" = 7,
                                                                                                                          "2 weeks" = 14,
-                                                                                                                         "1 month" = 28)),
+                                                                                                                         "1 month" = 28,
+                                                                                                                         "3 month" = 90)),
                       sliderInput(inputId = "confidenceBacktestAutomation", label = "Confidence Score Threshold", min = 0, max = 1, value = 0.7, step = 0.02),
                       numericInput(inputId = "feeInput", label = "Fee per Transaction", value = 0),
                       actionButton(inputId = "shortBacktest", label = "Generate Backtest"),
@@ -826,8 +842,20 @@ ui <- secure_app(
                 )),
         tabItem(tabName = "chat",
                 chat_ui("test1")
-
+                
+        ),
+        tabItem(tabName = "newsFeed",
+                fluidRow(
+                  uiOutput("newsfeed"),
+                  box(title = "Create New Post", status = "primary", solidHeader = TRUE,width=12,
+                      textInput(inputId = "titlePostText", label = "Your Post Title", placeholder = "Enter title here...", width = "33%"),
+                      textAreaInput(inputId = "createPostText",label = "", placeholder = "Your post text here..."),
+                      fileInput(inputId = "imagePostInput", label = "Upload an Image", placeholder = "Drop your image here...", width = "33%"),
+                      actionButton(inputId = "submitPost", label = "Submit Post")
+                      
+                  )
                 )
+        )
         
         # tabItem(tabName = "etherscan",
         #         add_busy_spinner(spin = "circle", color = "blue", height = "100px", width="100px", position = "bottom-right"),
@@ -870,6 +898,37 @@ server <- function(input, output, session) {
   
   source("DogeCoinML.R")
   
+  responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
+  assign('responses',responses,.GlobalEnv)
+  
+  new_post <- function (person, date, post.title, post.text, post.image) {
+    
+    
+    shinydashboardPlus::socialBox(title = person,
+                                  label = date,
+                                  width = 12,
+                                  # src = pic(person),
+                                  footer_padding = FALSE,
+                                  #Content
+                                  p(post.title, style="font-weight: bold;"),
+                                  p(post.text),
+                                  if(!is.na(post.image)){
+                                    img(src = post.image, height="50%", width = "50%")
+                                  }
+    )
+    
+  }
+  
+  output$newsfeed <- renderUI({
+    
+    shinydashboardPlus::box(purrr::pmap(.l = responses, .f = ~ new_post(person = ..2, date = ..1, post.title = ..3, post.text = ..4, post.image = ..5)  ),
+                            title = "User Posts",
+                            width = 12,
+                            gradientColor = "blue",
+                            footer_padding = FALSE
+    )
+  })
+  
   chat_server("test1",
               rds_path = test_rds,
               chat_user = reactiveValuesToList(res_auth)$user)
@@ -893,7 +952,8 @@ server <- function(input, output, session) {
   )
   
   res_auth <- secure_server(
-    check_credentials = check_credentials(credentials)
+    check_credentials = check_credentials(credentials),
+    keep_token = TRUE
   )
   output$auth_output <- renderPrint({
     reactiveValuesToList(res_auth)$user
@@ -903,6 +963,14 @@ server <- function(input, output, session) {
   
   observe({
     invalidateLater(1000, session)
+    if(!is.null(input$checkGroupBinance)){
+      if(input$tablist == "automation"){
+        x = riingo_crypto_latest(input$checkGroupBinance, exchanges = "binance")$close
+      }
+    }
+    
+    output$livePrice = renderText(paste0(input$checkGroupBinance,": ",round(as.numeric(x[length(x)]), digits = 4)))
+    
     isolate({
       if(is.null(input$timeframePredict)){
         
@@ -932,7 +1000,7 @@ server <- function(input, output, session) {
       }
       
       output$spotAccountBalancesAutomation = renderDataTable(datatable(spot_account_balances(), style = "bootstrap"))
-      output$livePrice = renderText(round(as.numeric(binance::market_price_ticker(input$selectCoinBinance)$price), digits = 4))
+      # output$livePrice = renderText(round(as.numeric(binance::market_price_ticker(input$checkGroupBinance)$price), digits = 4))
       
       x = aws.s3::get_bucket_df("cryptomlbucket", prefix = "Automation/")
       
@@ -967,6 +1035,7 @@ server <- function(input, output, session) {
     
     
   })
+  
   
   
   # user = res_auth$user
@@ -1012,70 +1081,79 @@ server <- function(input, output, session) {
       
     }else{
       x = BacktestSelected(input$select, input$slider1,input$timeframe, input$slider2, input$dateRangeOverview)
+      if(purchase.status == "NO PURCHASES MADE"){
+        shinyalert("Error",
+                   "No purchases made for these inputs, modify your inputs and try again",
+                   type = 'error')
+      }else if(purchase.status == "NOT ENOUGH CANDLES"){
+        shinyalert("Error",
+                   "The selected date range is too short for backtesting, please select a wider date range",
+                   type = 'error')
+      }
       assign("x",x,.GlobalEnv)
       # createModel(input$selectType,input$slider1, input$slider2, input$select, input$timeframe, input$slider1)
       senti = BacktestSentiment(input$selectType,input$slider1, input$slider2, input$select, input$timeframe)
     }
     if(exists("compare")){
       
-    
-    # output$precisionBox = renderValueBox({
-    #   shinydashboard::valueBox(value = paste0(precision,"%"), subtitle = "Precision Score", icon = icon("bullseye"))
-    # })
-    output$profitableTrades = renderValueBox({
-      shinydashboard::valueBox(value = profitable.trades, subtitle = "Profitable Trades", icon = icon("vials"))
-    })
-    output$sumPercentage = renderValueBox({
-      shinydashboard::valueBox(value = sum.percentage, subtitle = "Sum Percentage", icon = icon("vials"))
-    })
-    output$totalData = renderValueBox({
-      shinydashboard::valueBox(value = nrow(compare), subtitle = "Number of Candles Backtested", icon = icon("vials"))
-    })
-    output$predictedHits = renderValueBox({
-      shinydashboard::valueBox(value = nrow(df.purchases), subtitle = "Predicted Buy Signals", icon = icon("vials"))
-    })
-    output$precisionBoxSentiment = renderValueBox({
-      shinydashboard::valueBox(value = paste0(senti$precision,"%"), subtitle = "Precision Score", icon = icon("bullseye"))
-    })
-    output$totalDataSentiment = renderValueBox({
-      shinydashboard::valueBox(value = nrow(senti$df.examine), subtitle = "Number of Candles Backtested", icon = icon("vials"))
-    })
-    output$predictedHitsSentiment = renderValueBox({
-      shinydashboard::valueBox(value = nrow(senti$df.examine[senti$df.examine$prediction == 1,]), subtitle = "Predicted Buy Signals", icon = icon("vials"))
-    })
-    
-    
-    
-    
-    # compare2$Actual.Percent.High = paste0(compare2$Actual.Percent.High,"%")
-    # compare2$Actual.Percent.Low = paste0(compare2$Actual.Percent.Low,"%")
-    # compare2$Actual.Percent.Close = paste0(compare2$Actual.Percent.Close,"%")
-    # 
-    # compare2$Signal[compare2$Signal == 1] = "DID BUY"
-    # compare2$Signal[compare2$Signal == 0] = "DIDN'T BUY"
-    # 
-    # compare2$Actual[compare2$Actual == 0] = 'MISSED TARGET'
-    # compare2$Actual[compare2$Actual == 1] = 'HIT TARGET'
-    # 
-    # colnames(compare2) = c("Actual","Actual High","Actual Low","Actual Close","Confidence Score", "Signal","profit")
-    # 
-    # table1.colored = datatable(compare2, rownames = FALSE, options = list(pageLength = 20,
-    #                                                                       columnDefs = list(list(targets = 6, visible = FALSE))
-    #                                                                       
-    # ), style = "bootstrap") %>%
-    #   formatStyle('Actual','profit',
-    #               backgroundColor = styleEqual(c(0,1), c('darkred','lightgreen'))) %>%
-    #   formatStyle('Signal',
-    #               backgroundColor = styleEqual(c("DIDN'T BUY","DID BUY"), c('darkred','lightgreen')))
-    # 
-    # 
-    # 
-    # output$table1 = renderDataTable(table1.colored)
-    # output$modelPlot = renderPlot(hist(compare$Confidence.Score))
-    x = data.frame(confidence.scores)
-    # output$modelPlot = renderPlot(ggplot(data = x, aes(x = confidence.scores)) + geom_histogram(colour = "blue", alpha = 0.3))
-    
-    output$tradesMadeTable = renderDataTable(datatable(df.purchases, style = "bootstrap"))
+      
+      # output$precisionBox = renderValueBox({
+      #   shinydashboard::valueBox(value = paste0(precision,"%"), subtitle = "Precision Score", icon = icon("bullseye"))
+      # })
+      output$profitableTrades = renderValueBox({
+        shinydashboard::valueBox(value = profitable.trades, subtitle = "Profitable Trades", icon = icon("vials"))
+      })
+      output$sumPercentage = renderValueBox({
+        shinydashboard::valueBox(value = sum.percentage, subtitle = "Sum Percentage", icon = icon("vials"))
+      })
+      output$totalData = renderValueBox({
+        shinydashboard::valueBox(value = nrow(compare), subtitle = "Number of Candles Backtested", icon = icon("vials"))
+      })
+      output$predictedHits = renderValueBox({
+        shinydashboard::valueBox(value = nrow(df.purchases), subtitle = "Predicted Buy Signals", icon = icon("vials"))
+      })
+      output$precisionBoxSentiment = renderValueBox({
+        shinydashboard::valueBox(value = paste0(senti$precision,"%"), subtitle = "Precision Score", icon = icon("bullseye"))
+      })
+      output$totalDataSentiment = renderValueBox({
+        shinydashboard::valueBox(value = nrow(senti$df.examine), subtitle = "Number of Candles Backtested", icon = icon("vials"))
+      })
+      output$predictedHitsSentiment = renderValueBox({
+        shinydashboard::valueBox(value = nrow(senti$df.examine[senti$df.examine$prediction == 1,]), subtitle = "Predicted Buy Signals", icon = icon("vials"))
+      })
+      
+      
+      
+      
+      # compare2$Actual.Percent.High = paste0(compare2$Actual.Percent.High,"%")
+      # compare2$Actual.Percent.Low = paste0(compare2$Actual.Percent.Low,"%")
+      # compare2$Actual.Percent.Close = paste0(compare2$Actual.Percent.Close,"%")
+      # 
+      # compare2$Signal[compare2$Signal == 1] = "DID BUY"
+      # compare2$Signal[compare2$Signal == 0] = "DIDN'T BUY"
+      # 
+      # compare2$Actual[compare2$Actual == 0] = 'MISSED TARGET'
+      # compare2$Actual[compare2$Actual == 1] = 'HIT TARGET'
+      # 
+      # colnames(compare2) = c("Actual","Actual High","Actual Low","Actual Close","Confidence Score", "Signal","profit")
+      # 
+      # table1.colored = datatable(compare2, rownames = FALSE, options = list(pageLength = 20,
+      #                                                                       columnDefs = list(list(targets = 6, visible = FALSE))
+      #                                                                       
+      # ), style = "bootstrap") %>%
+      #   formatStyle('Actual','profit',
+      #               backgroundColor = styleEqual(c(0,1), c('darkred','lightgreen'))) %>%
+      #   formatStyle('Signal',
+      #               backgroundColor = styleEqual(c("DIDN'T BUY","DID BUY"), c('darkred','lightgreen')))
+      # 
+      # 
+      # 
+      # output$table1 = renderDataTable(table1.colored)
+      # output$modelPlot = renderPlot(hist(compare$Confidence.Score))
+      x = data.frame(confidence.scores)
+      # output$modelPlot = renderPlot(ggplot(data = x, aes(x = confidence.scores)) + geom_histogram(colour = "blue", alpha = 0.3))
+      
+      output$tradesMadeTable = renderDataTable(datatable(df.purchases, style = "bootstrap"))
     }else{
       output$tradesMadeTable = NULL
     }
@@ -1105,16 +1183,16 @@ server <- function(input, output, session) {
     }else{
       predict.next.bh.bl.tar(input$checkGroup, input$timeframePredict, input$slider3)
     }
-    
-    returned.sentiment = PerformSentimentAnalysis(input$checkGroup, input$slider3, input$selectTypeMult)
-    
-    x = FearGreedToday()
-    output$fearGreedRating = renderValueBox(shinydashboard::valueBox(value = toupper(x$fear.greed.rating), subtitle = "Today's Fear/Greed Rating"))
+    print(1)
+    # returned.sentiment = PerformSentimentAnalysis(input$checkGroup, input$slider3, input$selectTypeMult)
+    print(2)
+    # x = FearGreedToday()
+    # output$fearGreedRating = renderValueBox(shinydashboard::valueBox(value = toupper(x$fear.greed.rating), subtitle = "Today's Fear/Greed Rating"))
     # output$fearGreedScore = renderValueBox(shinydashboard::valueBox(value = round(x$fear.greed.score,2), subtitle = "Today's Fear/Greed Score"))
-    output$OneHrSent = renderValueBox(shinydashboard::valueBox(value = returned.sentiment$one.hr.sentiment, subtitle = "1 Hour Sentiment"))
-    output$EightHrSent = renderValueBox(shinydashboard::valueBox(value = returned.sentiment$eight.hr.sentiment, subtitle = "8 Hour Sentiment"))
-    output$TwenFourHrSent = renderValueBox(shinydashboard::valueBox(value = returned.sentiment$twenfour.hr.sentiment, subtitle = "24 Hour Sentiment"))
-    
+    # output$OneHrSent = renderValueBox(shinydashboard::valueBox(value = returned.sentiment$one.hr.sentiment, subtitle = "1 Hour Sentiment"))
+    # output$EightHrSent = renderValueBox(shinydashboard::valueBox(value = returned.sentiment$eight.hr.sentiment, subtitle = "8 Hour Sentiment"))
+    # output$TwenFourHrSent = renderValueBox(shinydashboard::valueBox(value = returned.sentiment$twenfour.hr.sentiment, subtitle = "24 Hour Sentiment"))
+    print(3)
     
     # dt.returned.sentiment = Color.DT(returned.sentiment$df.to.return)
     # output$sentimentTable = renderDataTable(dt.returned.sentiment)
@@ -1131,7 +1209,7 @@ server <- function(input, output, session) {
     dt.colored44 = Color.DT(predictions.df.indi44)
     
     
-    
+    print(4)
     output$multipleOutput1 = renderDataTable(dt.colored1)
     # output$multipleOutput1 = renderDataTable(datatable(predictions.df.indi1,
     #                                                     rownames = FALSE,
@@ -1161,9 +1239,9 @@ server <- function(input, output, session) {
       shinyjs::show("multipleOutput4")
       output$multipleOutput4 = renderDataTable(dt.colored4)
     }
-    
+    print(5)
     output$sentimentOutput1 = renderDataTable(dt.colored11)
-    
+    print(6)
     
     
     if(is.null(dt.colored22)){
@@ -1352,7 +1430,7 @@ server <- function(input, output, session) {
                type = 'success')
   })
   observeEvent(input$cancelBinanceAutomation, {
-
+    
     row.selected = input$activeAutomationInfo_rows_selected
     coin.selected = df.coins.running$Coins[row.selected]
     print(row.selected)
@@ -1364,7 +1442,7 @@ server <- function(input, output, session) {
     x.sel = x[grepl(pattern = paste0("Automation/",user.logged.in,"/"), x = x$Key),]
     coins.running = na.omit(str_match(string = x.sel$Key, pattern = "/.*/(.*).rds")[,2])
     y = data.frame(Coins = coins.running)
-
+    
     
     x = aws.s3::get_bucket_df("cryptomlbucket", prefix = "Automation/")
     
@@ -1460,6 +1538,7 @@ server <- function(input, output, session) {
                                                                                          "1 Hour" = "1hour",
                                                                                          "4 Hour" = "4hour",
                                                                                          "8 Hour" = "8hour",
+                                                                                         "12 Hour" = "12hour",
                                                                                          "1 Day" = "1day"))
     }
     if(input$selectType == "Forex"){
@@ -1480,9 +1559,12 @@ server <- function(input, output, session) {
     if(input$selectTypeMult == "Crypto"){
       updateSelectizeInput(inputId = "checkGroup", label = "Pick a Crypto to Predict", choices = checkbox_list, options = list(maxItems = 4))
       updateSelectInput(inputId = "timeframePredict",label = "Pick a Timeframe", choices = list("15 Minutes" = "15min",
+                                                                                                "30 Minutes" = "30min",
+                                                                                                "45 Minutes" = "45min",
                                                                                                 "1 Hour" = "1hour",
                                                                                                 "4 Hour" = "4hour",
                                                                                                 "8 Hour" = "8hour",
+                                                                                                "12 Hour" = "12hour",
                                                                                                 "1 Day" = "1day"))
     }
     if(input$selectTypeMult == "Forex"){
@@ -1709,15 +1791,67 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$timeframeAutomation, {
-    if(input$timeframeAutomation == "1hour"){
+    if(input$timeframeAutomation == "1hour" | input$timeframeAutomation == "15min" | input$timeframeAutomation == "30min" | input$timeframeAutomation == "45min"){
       updateSliderInput(inputId = "sliderAutomationTarget",label="Select Target Percentage Increase", min = 0.1, max = 1, step = 0.1, value = 0.1)
     }else if(input$timeframeAutomation == "4hour" | input$timeframeAutomation == "8hour" | input$timeframeAutomation == "1day"){
       updateSliderInput(inputId = "sliderAutomationTarget",label="Select Target Percentage Increase", min = 0.2, max = 3, step = 0.2, value = 0.2)
     }
   })
   
+  observeEvent(input$submitPost, {
+    responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
+    assign('responses',responses,.GlobalEnv)
+    
+    title.text = input$titlePostText
+    post.text = input$createPostText
+    post.image = input$imagePostInput
+    if(is.null(post.image)){
+      post.image = NA
+    }else{
+      file.copy(post.image$datapath, file.path("www", post.image$name))
+      post.image = post.image$name
+    }
+
+    x = data.frame(Timestamp = Sys.time(),
+                   User = user.logged.in,
+                   Post.Title = title.text,
+                   Post.Text = post.text,
+                   Post.Image = post.image)
+    print(x)
+
+    x = rbind(responses, x)
+
+    print(x)
+    tmp.dir = tempdir()
+    
+    saveRDS(x, paste0(tmp.dir, "/posts.RDS"))
+    
+    put_object(
+      file = paste0(tmp.dir,"/posts.RDS"), 
+      object = "posts.RDS", 
+      bucket = paste0("cryptomlbucket/rakibul_posts")
+    )
+    
+    responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
+    assign('responses',responses,.GlobalEnv)
+    output$newsfeed <- renderUI({
+      
+      shinydashboardPlus::box(purrr::pmap(.l = responses, .f = ~ new_post(person = ..2, date = ..1, post.title = ..3, post.text = ..4, post.image = ..5)  ),
+                              title = "User Posts",
+                              width = 12,
+                              gradientColor = "blue",
+                              footer_padding = FALSE
+      )
+    })
+    
+  })
   
-  
+  observeEvent(input$getLivePrice, {
+    output$livePrice = renderText(round(as.numeric(binance::market_price_ticker(input$checkGroupBinance)$price), digits = 4))
+  })
+    
+    
+    
 }
 
 # Run the application 

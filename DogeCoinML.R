@@ -487,12 +487,11 @@ getTimeRemaining2 = function(timeframe, type){
 
 
 predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold){
-  # # Symbols = Symbols
-  # Symbols = c('AAPL')
-  # Timeframe = 'weekly'
-  # i = 1
-  # SuccessThreshold = 0.9
-  # Type="Stocks"
+  # Symbols = Symbols
+  # Symbols = c('REEFUSDT')
+  # Timeframe = '12hour'
+  # SuccessThreshold = 0.5
+  # Type="Crypto"
   assign("predictions.df.indi1", NULL, .GlobalEnv)
   assign("predictions.df.indi2", NULL, .GlobalEnv)
   assign("predictions.df.indi3", NULL, .GlobalEnv)
@@ -671,7 +670,7 @@ predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold)
     
     
     
-    if(Timeframe == "1hour" | Timeframe == "15min"){
+    if(Timeframe == "1hour" | Timeframe == "15min" | Timeframe == "30min" | Timeframe == "45min"){
       predictions.df.pos = data.frame("Coin" = rep(toupper(Symbols[i]),5),
                                       "Price Change" = seq(from = 0.2, to = 1, by = 0.2),
                                       "C.Score.HIT.TARGET" = rep(NA,5),
@@ -955,8 +954,9 @@ predict_week = function(symbol, timeframe,type){
   
   symbol = toupper(symbol)
   # symbol = 'ETHUSDT'
-  # timeframe = '15min'
+  # timeframe = '12hour'
   # type = "Crypto"
+  # print("HELLO TESTING")
   num = str_match(string = timeframe, pattern = "(\\d+)")[,2]
   break.for.plot = str_replace(string = timeframe, pattern = "\\d+", replacement = paste0(num," "))
   if(timeframe == "daily" | timeframe == "weekly"){
@@ -973,7 +973,7 @@ predict_week = function(symbol, timeframe,type){
     data$time = gsub(pattern = "\\.", replacement = "-", x = data$time)
     
   }else{
-    data = possibly_riingo_crypto_prices(ticker = symbol, resample_frequency = timeframe, start_date = Sys.Date() - 21, end_date = Sys.Date())
+    data = possibly_riingo_crypto_prices(ticker = symbol, resample_frequency = timeframe, start_date = Sys.Date() - 28, end_date = Sys.Date() + 1)
     real.time = riingo_crypto_latest(ticker = symbol, resample_frequency = timeframe)
     
     data = rbind(data, real.time)
@@ -1043,13 +1043,29 @@ predict_week = function(symbol, timeframe,type){
     
   }else if(timeframe == "4hour"){
     
-    data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "4 hours")), ymd_hms(Sys.time()) + lubridate::days(10), by = '4 hours')[1:7],
+    data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "4 hours")), ymd_hms(Sys.time()) + lubridate::hours(100), by = '4 hours')[1:7],
+                          open = NA,
+                          high = NA,
+                          low = NA,
+                          close = NA)
+    
+  }else if(timeframe == "8hour"){
+    
+    data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "8 hours")), ymd_hms(Sys.time()) + lubridate::hours(150), by = '8 hours')[1:7],
+                          open = NA,
+                          high = NA,
+                          low = NA,
+                          close = NA)
+    
+  }else if(timeframe == "12hour"){
+    data.add = data.frame(time = seq(ymd_hms(floor_date(Sys.time(), unit = "12 hour")), ymd_hms(Sys.time()) + lubridate::hours(150), by = '12 hour')[1:7],
                           open = NA,
                           high = NA,
                           low = NA,
                           close = NA)
     
   }
+  
   
   data.add$time = as.character(data.add$time)
   data = rbind(data, data.add)
@@ -1183,8 +1199,55 @@ predict_week = function(symbol, timeframe,type){
   
   for.scale = c(x$data_y,x$predicted_y)
   
+
   if(timeframe == 'daily'){
-    plot.out = ggplot(data = x, aes(x = times)) + 
+    
+    # data.add = data.frame(time = seq(from = as_date(Sys.Date() + 1),
+    #                                  by = "day", length.out = 7),
+    #                       open = NA,
+    #                       high = NA,
+    #                       low = NA,
+    #                       close = NA)
+    # 
+    
+  }else if(timeframe == "weekly"){
+    # data.add = data.frame(time = seq(from = as_date(Sys.Date()),
+    #                                  by = "week", length.out = 7),
+    #                       open = NA,
+    #                       high = NA,
+    #                       low = NA,
+    #                       close = NA)
+  }else if(timeframe == "45min"){
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(20), by = '45 mins')[2:8]
+    
+  }else if(timeframe == "15min"){
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(5), by = '15 mins')[2:8]
+    
+  }else if(timeframe == "30min"){
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(10), by = '30 mins')[2:8]
+    
+  }else if(timeframe == "1hour"){
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(24), by = '1 hour')[2:8]
+    
+  }else if(timeframe == "4hour"){
+    
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(100), by = '4 hours')[2:8]
+  }else if(timeframe == "8hour"){
+    
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(150), by = '8 hours')[2:8]
+  }else if(timeframe == "12hour"){
+    
+    data.add = seq(ymd_hms(x$times[23], truncated = 3), ymd_hms(x$times[23], truncated = 3) + lubridate::hours(150), by = '12 hours')[2:8]
+  }
+  if(timeframe == "daily" | timeframe == "weekly"){
+    
+  }else{
+    x$times[24:30] = data.add
+  }
+
+  
+  if(timeframe == 'daily'){
+    plot.out = ggplot(data = x, aes(x = as.Date(times))) + 
       geom_line(aes(y = data_y), color = "blue") +
       geom_line(aes(y = predicted_y), color = "red") +
       xlab("Date") +
@@ -1194,7 +1257,7 @@ predict_week = function(symbol, timeframe,type){
       scale_y_continuous(limits = c(min(for.scale, na.rm = TRUE),max(for.scale, na.rm = TRUE))) +
       theme(axis.text.x=element_text(angle=60, hjust=1))
   }else if(timeframe == "weekly"){
-    plot.out = ggplot(data = x, aes(x = times)) + 
+    plot.out = ggplot(data = x, aes(x = as.Date(times))) + 
       geom_line(aes(y = data_y), color = "blue") +
       geom_line(aes(y = predicted_y), color = "red") +
       xlab("Date") +
@@ -2444,7 +2507,7 @@ ReturnSentimentValue <- function(x){
 ##############################################################
 
 PerformSentimentAnalysis <- function(coin, confidence, type){
-  # coin = c("BTCUSDT",'ETHUSDT',"LINAUSDT",'REEFUSDT')
+  # coin = c('REEFUSDT')
   # confidence = 0.5
   
   
@@ -2694,35 +2757,35 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   start.date = date.range[1]
   end.date = date.range[2]
   fee = 0
-  
+
   # user = "nick"
-  # start.date = "2023-11-15"
-  # end.date = "2023-11-22"
-  # coin = "REEFUSDT"
+  # start.date = Sys.Date() - 7
+  # end.date = Sys.Date() + 1
+  # coin = "FETUSDT"
   # timeframe = "1hour"
-  # confidence.score = 0.7
-  # target.percentage = 0.5
-  # take.profit = 0.8
-# 
-#   x = aws.s3::get_bucket_df("cryptomlbucket", prefix = "Automation/")
-# 
-#   x.sel = x[grepl(pattern = paste0("Automation/",user,"/"), x = x$Key),]
-#   coins.running = na.omit(str_match(string = x.sel$Key, pattern = "/.*/(.*).rds")[,2])
-# 
-# 
-#   df.coins.running = data.frame(User = character(),
-#                                 Timeframe = character(),
-#                                 Coins = character(),
-#                                 Target = character(),
-#                                 Confidence = character(),
-#                                 Percentage = character(),
-#                                 TakeProfit = character(),
-#                                 StopLoss = character(),
-#                                 Active = character())
-#   for(z in 1:length(coins.running)){
-#     dfx = possibly_s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/Automation/",user), object = paste0(coins.running[z],".rds"))
-#     df.coins.running = rbind(df.coins.running, dfx)
-#   }
+  # confidence.score = 0.5
+  # target.percentage = 1
+  # take.profit = 1
+
+    # x = aws.s3::get_bucket_df("cryptomlbucket", prefix = "Automation/")
+    # 
+    # x.sel = x[grepl(pattern = paste0("Automation/",user,"/"), x = x$Key),]
+    # coins.running = na.omit(str_match(string = x.sel$Key, pattern = "/.*/(.*).rds")[,2])
+    # 
+    # 
+    # df.coins.running = data.frame(User = character(),
+    #                               Timeframe = character(),
+    #                               Coins = character(),
+    #                               Target = character(),
+    #                               Confidence = character(),
+    #                               Percentage = character(),
+    #                               TakeProfit = character(),
+    #                               StopLoss = character(),
+    #                               Active = character())
+    # for(z in 1:length(coins.running)){
+    #   dfx = possibly_s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/Automation/",user), object = paste0(coins.running[z],".rds"))
+    #   df.coins.running = rbind(df.coins.running, dfx)
+    # }
   
   # For each coin running, I want to grab the last weeks worth of data by
   # the automation timeframe
@@ -2733,8 +2796,15 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   
   df = possibly_riingo_crypto_prices(ticker = coin,
                                      start_date = start.date,
-                                     end_date = as.Date(end.date),
-                                     resample_frequency = timeframe)
+                                     end_date = as.Date(end.date) + 1,
+                                     resample_frequency = timeframe,
+                                     exchanges = 'binance')
+  
+  if(nrow(df) < 30){
+    puchase.status = print("NOT ENOUGH CANDLES")
+    assign("purchase.status", "NOT ENOUGH CANDLES", .GlobalEnv)
+    return(NULL)
+  }
   
   bst = s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/TiingoBoosts"),
                      object = paste0("bst_",coin,"_",timeframe,target.percentage,".rds"))
@@ -2841,7 +2911,8 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   
   woulda.bought = which(predict.next >= confidence.score)
   if(length(woulda.bought) == 0){
-    print("NO PURCHASES MADE")
+    puchase.status = print("NO PURCHASES MADE")
+    assign("purchase.status", "NO PURCHASES MADE", .GlobalEnv)
     return(NULL)
   }
   
@@ -2863,11 +2934,11 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   df.purchases$PL = 0
   
   if(target.percentage > 0){
-  df.purchases$PL[df.purchases$OH >= df.purchases$Target] = df.purchases$Target[df.purchases$OH >= df.purchases$Target]
-  df.purchases$PL[df.purchases$OH < df.purchases$Target] = df.purchases$OC[df.purchases$OH < df.purchases$Target]
-  # df.purchases$PL[df.purchases$PL < (target.percentage*-2.5)] = (target.percentage*-2.5)
+    df.purchases$PL[df.purchases$OH >= df.purchases$Target] = df.purchases$Target[df.purchases$OH >= df.purchases$Target]
+    df.purchases$PL[df.purchases$OH < df.purchases$Target] = df.purchases$OC[df.purchases$OH < df.purchases$Target]
+    # df.purchases$PL[df.purchases$PL < (target.percentage*-2.5)] = (target.percentage*-2.5)
   }else{
-    df.purchases$PL[df.purchases$OL <= df.purchases$Target] = df.purchases$Target[df.purchases$OL >= df.purchases$Target]
+    df.purchases$PL[df.purchases$OL <= df.purchases$Target] = df.purchases$Target[df.purchases$OL <= df.purchases$Target]
     df.purchases$PL[df.purchases$OL > df.purchases$Target] = df.purchases$OC[df.purchases$OL > df.purchases$Target]
   }
   
@@ -2875,11 +2946,11 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   numeric_cols = sapply(df.purchases, is.numeric)
   df.purchases[numeric_cols] = lapply(df.purchases[numeric_cols], signif, digits = 6)
   
-
+  
   true.pos = length(which(df.purchases$PL == target.percentage))
   false.pos = nrow(df.purchases) - true.pos
   if(target.percentage > 0){
-  false.neg = length(which(round((df.ohlc$High - df.ohlc$Open) / df.ohlc$Open * 100, 3)  >= target.percentage)) - true.pos
+    false.neg = length(which(round((df.ohlc$High - df.ohlc$Open) / df.ohlc$Open * 100, 3)  >= target.percentage)) - true.pos
   }else{
     false.neg = length(which(round((df.ohlc$Low - df.ohlc$Open) / df.ohlc$Open * 100, 3)  <= target.percentage)) - true.pos
   }
@@ -2927,6 +2998,8 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   assign('profitable.trades',paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%"), .GlobalEnv)
   # profitable.trades = paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%")
   print(PL)
+  assign("purchase.status", "PURCHASES MADE", .GlobalEnv)
+  
   
   # to.return = list(compare = compare,
   #                  df.purchases = df.purchases,
@@ -2951,7 +3024,7 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
   # user = "nick"
   # timeframe = 7
   # fee = 0
-  # confidence.score = 0.74
+  # confidence.score = 0.5
   # 
   # x = aws.s3::get_bucket_df("cryptomlbucket", prefix = "Automation/")
   # 
@@ -2972,7 +3045,7 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
   #   dfx = possibly_s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/Automation/",user), object = paste0(coins.running[z],".rds"))
   #   df.coins.running = rbind(df.coins.running, dfx)
   # }
-  
+  # 
   # For each coin running, I want to grab the last weeks worth of data by
   # the automation timeframe
   
@@ -2993,15 +3066,17 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     bst = s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/TiingoBoosts"),
                        object = paste0("bst_",df.coins.running$Coins[i],"_",df.coins.running$Timeframe[i],df.coins.running$Target[i],".rds"))
     
-    if(df.coins.running$Timeframe[i] == '4hour' | df.coins.running$Timeframe[i] == '8hour'| df.coins.running$Timeframe[i] == '1hour'| df.coins.running$Timeframe[i] == '15min'){
+    if(df.coins.running$Timeframe[i] == '4hour' | df.coins.running$Timeframe[i] == '8hour'| df.coins.running$Timeframe[i] == '1hour'| df.coins.running$Timeframe[i] == '15min' |
+       df.coins.running$Timeframe[i] == '30min' | df.coins.running$Timeframe[i] == '45min'){
       #df1 = riingo_crypto_prices('REEFUSDT', end_date = Sys.Date(), resample_frequency = '4hour')
       #df1 = df1[-nrow(df1),]
       #df2 = riingo_crypto_latest('REEFUSDT', resample_frequency = '4hour')
       #df = rbind(df1,df2)
-      df1 = riingo_crypto_prices(df.coins.running$Coins[i], start_date = Sys.Date() - as.numeric(timeframe), end_date = Sys.Date(), resample_frequency = df.coins.running$Timeframe[i], exchanges = "binance")
-      df1 = df1[-nrow(df1),]
-      df2 = riingo_crypto_latest(df.coins.running$Coins[i], resample_frequency = df.coins.running$Timeframe[i], exchanges = "binance")
-      df = rbind(df1,df2)
+      df1 = riingo_crypto_prices(df.coins.running$Coins[i], start_date = Sys.Date() - as.numeric(timeframe), end_date = Sys.Date() + 1, resample_frequency = df.coins.running$Timeframe[i], exchanges = "binance")
+      # df1 = df1[-nrow(df1),]
+      # df2 = riingo_crypto_latest(df.coins.running$Coins[i], resample_frequency = df.coins.running$Timeframe[i], exchanges = "binance")
+      # df = rbind(df1,df2)
+      df = df1
     }else{
       df = riingo_crypto_prices(df.coins.running$Coins[i], start_date = Sys.Date() - as.numeric(timeframe), end_date = Sys.Date(), resample_frequency = df.coins.running$Timeframe[i], exchanges = "binance")
     }
@@ -3010,9 +3085,11 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     df = df[,4:9]
     df$Percent.Change = NA
     
+    
     colnames(df) = c("Date","Open","High","Low","Close","Volume","Percent.Change")
     df$Percent.Change = round((((df$High / df$Open) * 100) - 100), digits = 1)
     
+    orig.dates = data.frame(df$Date)
     
     
     #Add column for binary previouos day change+
@@ -3071,6 +3148,12 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
       df = cbind(df, candle.list[[k]])
     }
     df = df[-(1:20),]
+    if(nrow(df) < 6){
+      shinyalert("Error",
+                 "Select a longer backtesting period",
+                 type = 'error')
+      return()
+    }
     
     
     # Add lagged values
@@ -3105,7 +3188,18 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     ############################################# PREDICT CURRENT CANDLE
     predict.next = predict(bst, df)
     
-    
+    # df.testing = as.data.frame(df)
+    # df.testing = data.frame(cbind(predict.next, rownames(df.testing)))
+    # colnames(df.testing)[2] = "df.Date"
+    # df.testing$df.Date = as_datetime(df.testing$df.Date)
+    # 
+    # df.testing.merge = left_join(orig.dates, df.testing, by = "df.Date")
+    # 
+    # df.testing.merge = pad(df.testing.merge, interval = "15 mins")
+    # 
+    # 
+    # predict.next = df.testing$predict.next
+    # predict.next[is.na(predict.next)] = 0
     
     if(i == 1){
       predictions.comb = data.frame(predict.next)
@@ -3159,11 +3253,19 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     df.purchases = rbind(df.purchases,temp.df)
     
   }
+  
+  if(all(is.na(woulda.bought))){
+    shinyalert("Error",
+               "No purchases detected. Additionally, If your automation is on mixed timeframes, your results for back-testing on this tab will be skewed.",
+               type = 'error')
+    return()
+  }
   if(any(is.na(confidence.scores))){
     df.purchases$Confidence = round(confidence.scores[-which(is.na(confidence.scores))], 3)
   }else{
     df.purchases$Confidence = round(confidence.scores, 3)
   }
+
   
   df.purchases = na.omit(df.purchases)
   
