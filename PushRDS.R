@@ -6,8 +6,16 @@ Sys.setenv(
   "AWS_DEFAULT_REGION" = "us-east-1"
 )
 
-list_files = list.files('E:/bsts_T-11-26-2023', full.names = TRUE)
-file_names = list.files('E:/bsts_T-11-26-2023')
+credentials1 = s3read_using(FUN = readRDS, bucket = paste0("cryptomlbucket/APIKeys"), object = "credentials.rds")
+
+df = data.frame(User = "eb1tdaddy",
+                Password = "MRen*1177$",
+                APIKey = "CSd5FtnzmasGAdqD4hXthrekaMtprukLMh8ZhtLLZhQuTSEn82jGH7mtWGZoAhQg",
+                APISecret = "BIAwNDCD8wE0vbTsOohewRj4pKepyBTuqSYVjwdU5CLSRRQEQAB2AEmPmQqFTQ71")
+
+credentials1 = rbind(credentials1, df)
+# list_files = list.files('E:/bsts_T-11-26-2023', full.names = TRUE)
+# file_names = list.files('E:/bsts_T-11-26-2023')
 
 # ind = grep(pattern = "BreakL", x = file_names)
 # 
@@ -20,12 +28,12 @@ for(i in 1:length(list_files)){
   
   x = readRDS(list_files[i])
   
-  saveRDS(x, paste0(temp.loc,"/",file_names[i]))
+  saveRDS(credentials1, paste0(temp.loc,"/x.rds"))
   
   put_object(
-    file = paste0(temp.loc,"/",file_names[i]), 
-    object = file_names[i], 
-    bucket = paste0("cryptomlbucket/bsts_T/bsts_T")
+    file = paste0(temp.loc,"/x.rds"), 
+    object = "credentials.rds", 
+    bucket = paste0("cryptomlbucket/APIKeys")
   )
   
   print(paste0(i, " out of: ", length(list_files)))

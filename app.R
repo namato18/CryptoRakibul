@@ -426,18 +426,25 @@ ui <- secure_app(
                       paste0("Either BUY or DON'T BUY depending on if the Confidence.Score.HIT.TARGET is above or below your selected BUY prediction threshold")
                       
                   ),
-                  box(title = "Prediction 1", status = "primary", solidHeader = TRUE, width=6,
-                      dataTableOutput("multipleOutput1")
+                  column(width = 6,
+                         box(title = "Prediction 1", status = "primary", solidHeader = TRUE, width=NULL,
+                             dataTableOutput("multipleOutput1")
+                         ),
+                         box(title = "Prediction 3", status = "primary", solidHeader = TRUE, width=NULL,
+                             dataTableOutput("multipleOutput3")
+                         )
                   ),
-                  box(title = "Prediction 2", status = "primary", solidHeader = TRUE, width=6,
-                      dataTableOutput("multipleOutput2")
-                  ),
-                  box(title = "Prediction 3", status = "primary", solidHeader = TRUE, width=6,
-                      dataTableOutput("multipleOutput3")
-                  ),
-                  box(title = "Prediction 4", status = "primary", solidHeader = TRUE, width=6,
-                      dataTableOutput("multipleOutput4")
-                  ),
+                  column(width = 6,
+                         box(title = "Prediction 2", status = "primary", solidHeader = TRUE, width=NULL,
+                             dataTableOutput("multipleOutput2")
+                         ),
+                         
+                         box(title = "Prediction 4", status = "primary", solidHeader = TRUE, width=NULL,
+                             dataTableOutput("multipleOutput4")
+                         )
+                  )
+                  
+                  
                   # box(title = "Sentiment Analysis", status = "primary", solidHeader = TRUE, width=12,
                   #     strong("NOTE THAT SENTIMENT ANALYSIS ONLY DISPLAYS PREDICTIONS FOR THE 1 DAY TIMEFRAME"),
                   #     br(),
@@ -896,6 +903,7 @@ ui <- secure_app(
 # Define server logic
 server <- function(input, output, session) {
   
+  
   source("DogeCoinML.R")
   
   responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
@@ -965,11 +973,11 @@ server <- function(input, output, session) {
     invalidateLater(1000, session)
     if(!is.null(input$checkGroupBinance)){
       if(input$tablist == "automation"){
-        x = riingo_crypto_latest(input$checkGroupBinance, exchanges = "binance")$close
+        # x = riingo_crypto_latest(input$checkGroupBinance, exchanges = "binance")$close
       }
     }
     
-    output$livePrice = renderText(paste0(input$checkGroupBinance,": ",round(as.numeric(x[length(x)]), digits = 4)))
+    # output$livePrice = renderText(paste0(input$checkGroupBinance,": ",round(as.numeric(x[length(x)]), digits = 4)))
     
     isolate({
       if(is.null(input$timeframePredict)){
@@ -1203,10 +1211,10 @@ server <- function(input, output, session) {
     dt.colored3 = Color.DT(predictions.df.indi3)
     dt.colored4 = Color.DT(predictions.df.indi4)
     
-    dt.colored11 = Color.DT(predictions.df.indi11)
-    dt.colored22 = Color.DT(predictions.df.indi22)
-    dt.colored33 = Color.DT(predictions.df.indi33)
-    dt.colored44 = Color.DT(predictions.df.indi44)
+    # dt.colored11 = Color.DT(predictions.df.indi11)
+    # dt.colored22 = Color.DT(predictions.df.indi22)
+    # dt.colored33 = Color.DT(predictions.df.indi33)
+    # dt.colored44 = Color.DT(predictions.df.indi44)
     
     
     print(4)
@@ -1244,24 +1252,24 @@ server <- function(input, output, session) {
     print(6)
     
     
-    if(is.null(dt.colored22)){
-      shinyjs::hide("sentimentOutput2")
-    }else{
-      shinyjs::show("sentimentOutput2")
-      output$sentimentOutput2 = renderDataTable(dt.colored22)
-    }
-    if(is.null(dt.colored33)){
-      shinyjs::hide("sentimentOutput3")
-    }else{
-      shinyjs::show("sentimentOutput3")
-      output$sentimentOutput3 = renderDataTable(dt.colored33)
-    }
-    if(is.null(dt.colored44)){
-      shinyjs::hide("sentimentOutput4")
-    }else{
-      shinyjs::show("sentimentOutput4")
-      output$sentimentOutput4 = renderDataTable(dt.colored44)
-    }
+    # if(is.null(dt.colored22)){
+    #   shinyjs::hide("sentimentOutput2")
+    # }else{
+    #   shinyjs::show("sentimentOutput2")
+    #   output$sentimentOutput2 = renderDataTable(dt.colored22)
+    # }
+    # if(is.null(dt.colored33)){
+    #   shinyjs::hide("sentimentOutput3")
+    # }else{
+    #   shinyjs::show("sentimentOutput3")
+    #   output$sentimentOutput3 = renderDataTable(dt.colored33)
+    # }
+    # if(is.null(dt.colored44)){
+    #   shinyjs::hide("sentimentOutput4")
+    # }else{
+    #   shinyjs::show("sentimentOutput4")
+    #   output$sentimentOutput4 = renderDataTable(dt.colored44)
+    # }
     
     output$binancePredictionTable = renderDataTable(dt.colored)
     output$candlestickPlot = renderPlotly(createCandlePlot(input$candlestickInput))
@@ -1811,16 +1819,16 @@ server <- function(input, output, session) {
       file.copy(post.image$datapath, file.path("www", post.image$name))
       post.image = post.image$name
     }
-
+    
     x = data.frame(Timestamp = Sys.time(),
                    User = user.logged.in,
                    Post.Title = title.text,
                    Post.Text = post.text,
                    Post.Image = post.image)
     print(x)
-
+    
     x = rbind(responses, x)
-
+    
     print(x)
     tmp.dir = tempdir()
     
@@ -1846,12 +1854,12 @@ server <- function(input, output, session) {
     
   })
   
-  observeEvent(input$getLivePrice, {
-    output$livePrice = renderText(round(as.numeric(binance::market_price_ticker(input$checkGroupBinance)$price), digits = 4))
-  })
-    
-    
-    
+  # observeEvent(input$getLivePrice, {
+  #   output$livePrice = renderText(round(as.numeric(binance::market_price_ticker(input$checkGroupBinance)$price), digits = 4))
+  # })
+  
+  
+  
 }
 
 # Run the application 
