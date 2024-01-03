@@ -961,6 +961,7 @@ server <- function(input, output, session) {
   
   res_auth <- secure_server(
     check_credentials = check_credentials(credentials),
+    timeout = 0,
     keep_token = TRUE
   )
   output$auth_output <- renderPrint({
