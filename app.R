@@ -23,6 +23,9 @@ library(shinyChatR)
 
 test_rds <- "df.rds"
 
+current.env = environment()
+print(current.env)
+
 
 Color.DT = function(df){
   
@@ -907,7 +910,7 @@ server <- function(input, output, session) {
   source("DogeCoinML.R")
   
   responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
-  assign('responses',responses,.GlobalEnv)
+  assign('responses',responses,current.env)
   
   new_post <- function (person, date, post.title, post.text, post.image) {
     
@@ -996,7 +999,7 @@ server <- function(input, output, session) {
       
     }else{
       user.logged.in = reactiveValuesToList(res_auth)$user
-      assign("user.logged.in", user.logged.in,.GlobalEnv)
+      assign("user.logged.in", user.logged.in,current.env)
       secret = credentials$secret[credentials$user == reactiveValuesToList(res_auth)$user]
       api.key = credentials$api.key[credentials$user == reactiveValuesToList(res_auth)$user]
       
@@ -1034,7 +1037,7 @@ server <- function(input, output, session) {
       y = data.frame(Coins = coins.running)
       if(length(coins.running > 0)){
         output$activeAutomationInfo = renderDataTable(datatable(df.coins.running, selection = "single", style = "bootstrap"))
-        assign("df.coins.running",df.coins.running,.GlobalEnv)
+        assign("df.coins.running",df.coins.running,current.env)
         
       }else{
         output$activeAutomationInfo = NULL
@@ -1049,7 +1052,7 @@ server <- function(input, output, session) {
   
   # user = res_auth$user
   
-  # .GlobalEnv = environment()
+  # current.env = environment()
   # Read in functions
   
   output$decimalsAllowed = renderText(paste0(coin_decimals$decimals[coin_decimals$symbol == input$selectCoinBinance], " decimal places allowed."))
@@ -1064,8 +1067,8 @@ server <- function(input, output, session) {
     all.bst.numbers = str_match(string = all.bst.names, pattern = "bst_(.*)\\.")[,2]
     all.bst.path = list.files(path = "bsts", pattern = ".rds", full.names = TRUE)
     all.bst = lapply(all.bst.path, readRDS)
-    assign('all.bst.numbers',all.bst.numbers,.GlobalEnv)
-    assign('all.bst',all.bst,.GlobalEnv)
+    assign('all.bst.numbers',all.bst.numbers,current.env)
+    assign('all.bst',all.bst,current.env)
     
     predict.best(0.3, all.bst, all.bst.names)
     
@@ -1089,7 +1092,7 @@ server <- function(input, output, session) {
     if(input$slider1 == 0){
       
     }else{
-      x = BacktestSelected(input$select, input$slider1,input$timeframe, input$slider2, input$dateRangeOverview)
+      x = BacktestSelected(input$select, input$slider1,input$timeframe, input$slider2, input$dateRangeOverview, current.env)
       if(purchase.status == "NO PURCHASES MADE"){
         shinyalert("Error",
                    "No purchases made for these inputs, modify your inputs and try again",
@@ -1099,7 +1102,7 @@ server <- function(input, output, session) {
                    "The selected date range is too short for backtesting, please select a wider date range",
                    type = 'error')
       }
-      assign("x",x,.GlobalEnv)
+      assign("x",x,current.env)
       # createModel(input$selectType,input$slider1, input$slider2, input$select, input$timeframe, input$slider1)
       senti = BacktestSentiment(input$selectType,input$slider1, input$slider2, input$select, input$timeframe)
     }
@@ -1188,9 +1191,9 @@ server <- function(input, output, session) {
     updateSelectInput(session = session, inputId = 'candlestickInput', choices = x, selected = head(x,1))
     
     if(input$selectTypeMult == "Crypto" | input$selectTypeMult == "Stocks"){
-      predict.tomorrow.multiple(input$selectTypeMult,input$checkGroup, input$timeframePredict, input$slider3)
+      predict.tomorrow.multiple(input$selectTypeMult,input$checkGroup, input$timeframePredict, input$slider3, current.env)
     }else{
-      predict.next.bh.bl.tar(input$checkGroup, input$timeframePredict, input$slider3)
+      predict.next.bh.bl.tar(input$checkGroup, input$timeframePredict, input$slider3, current.env)
     }
     print(1)
     # returned.sentiment = PerformSentimentAnalysis(input$checkGroup, input$slider3, input$selectTypeMult)
@@ -1273,12 +1276,12 @@ server <- function(input, output, session) {
     # }
     
     output$binancePredictionTable = renderDataTable(dt.colored)
-    output$candlestickPlot = renderPlotly(createCandlePlot(input$candlestickInput))
+    output$candlestickPlot = renderPlotly(createCandlePlot(input$candlestickInput, current.env))
   })
   
   observeEvent(input$action5, {
     # showModal(modalDialog("Generating predictions...", footer = NULL))
-    output$nextWeekOutput = renderPlot(predict_week(tolower(input$selectNextWeek), input$selectTimeFrame, input$selectTypeWeek))
+    output$nextWeekOutput = renderPlot(predict_week(tolower(input$selectNextWeek), input$selectTimeFrame, input$selectTypeWeek, current.env))
     output$forecastWeekOutput = renderDataTable(datatable(week.forecast.df, style = "bootstrap", rownames = FALSE))
     
     # on.exit(removeModal())
@@ -1427,7 +1430,7 @@ server <- function(input, output, session) {
     
     if(length(coins.running) > 0){
       output$activeAutomationInfo = renderDataTable(datatable(df.coins.running, selection = "single", style = "bootstrap"))
-      assign("df.coins.running",df.coins.running,.GlobalEnv)
+      assign("df.coins.running",df.coins.running,current.env)
     }else{
       output$activeAutomationInfo = NULL
     }    
@@ -1473,7 +1476,7 @@ server <- function(input, output, session) {
     }
     if(length(coins.running > 0)){
       output$activeAutomationInfo = renderDataTable(datatable(df.coins.running, selection = "single", style = "bootstrap"))
-      assign("df.coins.running",df.coins.running,.GlobalEnv)
+      assign("df.coins.running",df.coins.running,current.env)
       
     }else{
       output$activeAutomationInfo = NULL
@@ -1601,7 +1604,7 @@ server <- function(input, output, session) {
   # observeEvent(input$selectTopCoin, {
   #   
   #   holder.info = GetTopHolders(input$selectTopCoin)
-  #   assign("holder.info",holder.info,.GlobalEnv)
+  #   assign("holder.info",holder.info,current.env)
   #   
   #   output$holderInfo = renderDataTable({
   #     datatable(holder.info, rownames = FALSE, style = "bootstrap", selection = "single")
@@ -1809,7 +1812,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$submitPost, {
     responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
-    assign('responses',responses,.GlobalEnv)
+    assign('responses',responses,current.env)
     
     title.text = input$titlePostText
     post.text = input$createPostText
@@ -1842,7 +1845,7 @@ server <- function(input, output, session) {
     )
     
     responses = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/rakibul_posts", object = "posts.RDS")
-    assign('responses',responses,.GlobalEnv)
+    assign('responses',responses,current.env)
     output$newsfeed <- renderUI({
       
       shinydashboardPlus::box(purrr::pmap(.l = responses, .f = ~ new_post(person = ..2, date = ..1, post.title = ..3, post.text = ..4, post.image = ..5)  ),

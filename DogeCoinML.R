@@ -40,8 +40,8 @@ Sys.getenv()
 #################################################################################################################
 #################################################################################################################
 # symbol='btcusd'
-createCandlePlot = function(symbol){
-  return(get(paste0('df_candleplot_',symbol)))
+createCandlePlot = function(symbol, current.env){
+  return(get(paste0('df_candleplot_',symbol),envir = current.env))
 }
 
 #################################################################################################################
@@ -486,16 +486,16 @@ getTimeRemaining2 = function(timeframe, type){
 
 
 
-predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold){
+predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold, current.env){
   # Symbols = Symbols
   # Symbols = c('REEFUSDT')
   # Timeframe = '12hour'
   # SuccessThreshold = 0.5
   # Type="Crypto"
-  assign("predictions.df.indi1", NULL, .GlobalEnv)
-  assign("predictions.df.indi2", NULL, .GlobalEnv)
-  assign("predictions.df.indi3", NULL, .GlobalEnv)
-  assign("predictions.df.indi4", NULL, .GlobalEnv)
+  assign("predictions.df.indi1", NULL, current.env)
+  assign("predictions.df.indi2", NULL, current.env)
+  assign("predictions.df.indi3", NULL, current.env)
+  assign("predictions.df.indi4", NULL, current.env)
   
   
   print(Type)
@@ -572,7 +572,7 @@ predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold)
     df_candle_plot = df_candle_plot %>% layout(title = paste0('Last 30 candles for ',toupper(Symbols[i])),
                                                xaxis = list(rangeslider = list(visible = F)))
     
-    assign(paste0('df_candleplot_',Symbols[i]),df_candle_plot,.GlobalEnv)
+    assign(paste0('df_candleplot_',Symbols[i]),df_candle_plot,current.env)
     
     # Adding Moving Averages
     df$MA10 = NA
@@ -924,13 +924,13 @@ predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold)
     predictions.df.indi = predictions.df.indi[,-4]
     colnames(predictions.df.indi) = c("Coin","Price.Change","CS HT","CS BH", "Prev.High","CS BL", "Prev.Low","Signal")
     predictions.df.indi$`CS HT` = round(predictions.df.indi$`CS HT`, 3)
-    assign(paste0("predictions.df.indi",i), predictions.df.indi, .GlobalEnv)
+    assign(paste0("predictions.df.indi",i), predictions.df.indi, current.env)
     
     
   }
   predictions.df.comb = predictions.df.comb[,-4]
   colnames(predictions.df.comb) = c("Coin","Price.Change","CS HT","CS BH", "Prev.High","CS BL", "Prev.Low","Signal")
-  assign("predictions.df.comb",predictions.df.comb,.GlobalEnv)
+  assign("predictions.df.comb",predictions.df.comb,current.env)
   
   
   
@@ -950,7 +950,7 @@ predict.tomorrow.multiple <- function(Type,Symbols, Timeframe, SuccessThreshold)
 
 
 
-predict_week = function(symbol, timeframe,type){
+predict_week = function(symbol, timeframe,type, current.env){
   
   symbol = toupper(symbol)
   # symbol = 'ETHUSDT'
@@ -960,7 +960,7 @@ predict_week = function(symbol, timeframe,type){
   num = str_match(string = timeframe, pattern = "(\\d+)")[,2]
   break.for.plot = str_replace(string = timeframe, pattern = "\\d+", replacement = paste0(num," "))
   if(timeframe == "daily" | timeframe == "weekly"){
-    data = data.frame(getSymbols.tiingo(Symbols = symbol, auto.assign = FALSE,api.key = '6fbd6ce7c9e035489f6238bfab127fcedbe34ac2', periodicity = timeframe))
+    data = data.frame(getSymbols.tiingo(Symbols = symbol, auto.assign = FALSE,api.key = 'bea6df07d69d627087abb23b369b3d0f82e75739', periodicity = timeframe))
     data = data[,1:4]
     colnames(data) = c('open','high','low','close')
     
@@ -1277,7 +1277,7 @@ predict_week = function(symbol, timeframe,type){
       theme(axis.text.x=element_text(angle=60, hjust=1))
   }
   colnames(x) = c("Past Close Price","Predicted Close Price","Date")
-  assign("week.forecast.df",x,.GlobalEnv)
+  assign("week.forecast.df",x,current.env)
   print(x)
   
   
@@ -1624,7 +1624,7 @@ build.TV.model <- function(df, timeframe){
 ##############################################################
 ##############################################################
 ##############################################################
-predict.next.ohlc = function(symbol, output){
+predict.next.ohlc = function(symbol, output, current.env){
   
   pair = str_match(string = symbol, pattern = "(.*)_")[,2]
   timeframe = str_match(string = symbol, pattern = "_(.*)")[,2]
@@ -1636,7 +1636,7 @@ predict.next.ohlc = function(symbol, output){
   
   df1 = riingo_fx_prices(pair, start_date = Sys.Date() - 30, end_date = Sys.Date(), resample_frequency = timeframe)
   df1 = df1[-nrow(df1),]
-  df2 = httr::GET(paste0("https://api.tiingo.com/tiingo/fx/",pair,"/prices?resampleFreq=",timeframe,"&token=6fbd6ce7c9e035489f6238bfab127fcedbe34ac2"))
+  df2 = httr::GET(paste0("https://api.tiingo.com/tiingo/fx/",pair,"/prices?resampleFreq=",timeframe,"&token=bea6df07d69d627087abb23b369b3d0f82e75739"))
   request_char = rawToChar(df2$content)
   request_json = jsonlite::fromJSON(request_char, flatten = TRUE)
   df2 = request_json
@@ -1720,8 +1720,8 @@ predict.next.ohlc = function(symbol, output){
   
   p.change.high = (pred.high - df$Close)/df$Close * 100
   
-  assign("pred_High",pred.high,.GlobalEnv)
-  assign("p.change.high",p.change.high,.GlobalEnv)
+  assign("pred_High",pred.high,current.env)
+  assign("p.change.high",p.change.high,current.env)
   
   output$predictPercentChangeHigh = renderInfoBox({
     infoBox("Predicted High", round(pred_High, digits = 3),icon = icon("bullseye"))
@@ -1737,15 +1737,15 @@ predict.next.ohlc = function(symbol, output){
 ##############################################################
 ##############################################################
 
-predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh){
+predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh, current.env){
   # symbol = "USDCAD"
   # timeframe = "1hour"
   # success.thresh = "0.8"
   
-  assign("predictions.df.indi1", NULL, .GlobalEnv)
-  assign("predictions.df.indi2", NULL, .GlobalEnv)
-  assign("predictions.df.indi3", NULL, .GlobalEnv)
-  assign("predictions.df.indi4", NULL, .GlobalEnv)
+  assign("predictions.df.indi1", NULL, current.env)
+  assign("predictions.df.indi2", NULL, current.env)
+  assign("predictions.df.indi3", NULL, current.env)
+  assign("predictions.df.indi4", NULL, current.env)
   
   predictions.df.comb = data.frame("Coin" = character(),
                                    "Price Change" = character(),
@@ -1770,7 +1770,7 @@ predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh){
       
       df1 = riingo_fx_prices(pair, start_date = Sys.Date() - 30, end_date = Sys.Date(), resample_frequency = timeframe)
       df1 = df1[-nrow(df1),]
-      df2 = httr::GET(paste0("https://api.tiingo.com/tiingo/fx/",pair,"/prices?resampleFreq=",timeframe,"&token=6fbd6ce7c9e035489f6238bfab127fcedbe34ac2"))
+      df2 = httr::GET(paste0("https://api.tiingo.com/tiingo/fx/",pair,"/prices?resampleFreq=",timeframe,"&token=bea6df07d69d627087abb23b369b3d0f82e75739"))
       request_char = rawToChar(df2$content)
       request_json = jsonlite::fromJSON(request_char, flatten = TRUE)
       df2 = request_json
@@ -1802,7 +1802,7 @@ predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh){
       df_candle_plot = df_candle_plot %>% layout(title = paste0('Last 30 candles for ',toupper(pair)),
                                                  xaxis = list(rangeslider = list(visible = F)))
       
-      assign(paste0('df_candleplot_',pair),df_candle_plot,.GlobalEnv)
+      assign(paste0('df_candleplot_',pair),df_candle_plot,current.env)
       ###############################
       ############################### ADD IN MOVING AVERAGES
       df$MA10 = NA
@@ -1920,7 +1920,7 @@ predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh){
       if(prediction == "BreakH" | prediction == "BreakL"){
         bst = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/FXCleanBoosts", object = paste0("bst_",pair,"_",timeframe,"_",prediction,".rds"))
         pred = predict(bst, df)
-        assign(paste0("pred_",prediction),pred,.GlobalEnv)
+        assign(paste0("pred_",prediction),pred,current.env)
       }else{
         for(z in seq(from= 0.05, to = 0.25, by=0.05)){
           bst.pos = s3read_using(FUN = readRDS, bucket = "cryptomlbucket/FXCleanBoosts", object = paste0("bst_",pair,"_",timeframe,z,".rds"))
@@ -1967,7 +1967,7 @@ predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh){
     predictions.df.indi = predictions.df.indi[,-4]
     colnames(predictions.df.indi) = c("Coin","Price.Change","CS HT","CS BH", "Prev.High","CS BL", "Prev.Low","Signal")
     predictions.df.indi$`CS HT` = round(predictions.df.indi$`CS HT`, 3)
-    assign(paste0("predictions.df.indi",j), predictions.df.indi, .GlobalEnv)
+    assign(paste0("predictions.df.indi",j), predictions.df.indi, current.env)
     print(j)
     
     # COMBINED
@@ -1976,7 +1976,7 @@ predict.next.bh.bl.tar = function(symbol,timeframe, success.thresh){
   }
   predictions.df.comb = predictions.df.comb[,-4]
   colnames(predictions.df.comb) = c("Coin","Price.Change","CS HT","CS BH", "Prev.High","CS BL", "Prev.Low","Signal")
-  assign("predictions.df.comb", predictions.df.comb, .GlobalEnv)
+  assign("predictions.df.comb", predictions.df.comb, current.env)
   
 }
 
@@ -2040,7 +2040,7 @@ GetBlockTime = function(days){
 ##############################################################
 ##############################################################
 
-GetHolderInfo = function(coin.address, holder.address, days){
+GetHolderInfo = function(coin.address, holder.address, days, current.env){
   print("made it inside function")
   block.number = GetBlockTime(30)
   # # #
@@ -2071,12 +2071,12 @@ GetHolderInfo = function(coin.address, holder.address, days){
   if(message == "No transactions found"){
     print(message)
     status = "inactive"
-    assign("status",status,.GlobalEnv)
+    assign("status",status,current.env)
     
     return(NULL)
   }else{
     status = "active"
-    assign("status",status,.GlobalEnv)
+    assign("status",status,current.env)
     
     df = test$result
     
@@ -2090,10 +2090,10 @@ GetHolderInfo = function(coin.address, holder.address, days){
     
     df = df %>%
       select("from","to","in.out","tokenName","datetime","actualValue")
-    assign('df.test',df,.GlobalEnv)
+    assign('df.test',df,current.env)
     
     seven.day.df = df[df$datetime >= Sys.Date() - 7,]
-    assign("seven.day.df",seven.day.df,.GlobalEnv)
+    assign("seven.day.df",seven.day.df,current.env)
     
     
     
@@ -2506,16 +2506,16 @@ ReturnSentimentValue <- function(x){
 ##############################################################
 ##############################################################
 
-PerformSentimentAnalysis <- function(coin, confidence, type){
+PerformSentimentAnalysis <- function(coin, confidence, type, current.env){
   # coin = c('REEFUSDT')
   # confidence = 0.5
   
   
   
-  assign("predictions.df.indi11", NULL, .GlobalEnv)
-  assign("predictions.df.indi22", NULL, .GlobalEnv)
-  assign("predictions.df.indi33", NULL, .GlobalEnv)
-  assign("predictions.df.indi44", NULL, .GlobalEnv)
+  assign("predictions.df.indi11", NULL, current.env)
+  assign("predictions.df.indi22", NULL, current.env)
+  assign("predictions.df.indi33", NULL, current.env)
+  assign("predictions.df.indi44", NULL, current.env)
   
   if(type != "Crypto"){
     return()
@@ -2685,7 +2685,7 @@ PerformSentimentAnalysis <- function(coin, confidence, type){
     
     colnames(df.to.return) = c("Coin", "Price.Change", "CS HT", "Signal")
     
-    assign(paste0("predictions.df.indi",z,z), df.to.return, .GlobalEnv)
+    assign(paste0("predictions.df.indi",z,z), df.to.return, current.env)
     
   }
   
@@ -2752,7 +2752,7 @@ BacktestSentiment <- function(Type,TargetIncreasePercent, SuccessThreshold, Symb
 ##############################################################
 ##############################################################
 
-BacktestSelected <- function(coin, target.percentage, timeframe, confidence.score, date.range){
+BacktestSelected <- function(coin, target.percentage, timeframe, confidence.score, date.range, current.env){
   
   start.date = date.range[1]
   end.date = date.range[2]
@@ -2802,7 +2802,7 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   
   if(nrow(df) < 30){
     puchase.status = print("NOT ENOUGH CANDLES")
-    assign("purchase.status", "NOT ENOUGH CANDLES", .GlobalEnv)
+    assign("purchase.status", "NOT ENOUGH CANDLES", current.env)
     return(NULL)
   }
   
@@ -2912,12 +2912,12 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   woulda.bought = which(predict.next >= confidence.score)
   if(length(woulda.bought) == 0){
     puchase.status = print("NO PURCHASES MADE")
-    assign("purchase.status", "NO PURCHASES MADE", .GlobalEnv)
+    assign("purchase.status", "NO PURCHASES MADE", current.env)
     return(NULL)
   }
   
   confidence.scores = predict.next[woulda.bought]
-  assign('confidence.scores',confidence.scores,.GlobalEnv)
+  assign('confidence.scores',confidence.scores,current.env)
   
   
   df.purchases = df.ohlc[woulda.bought,]
@@ -2954,14 +2954,14 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   }else{
     false.neg = length(which(round((df.ohlc$Low - df.ohlc$Open) / df.ohlc$Open * 100, 3)  <= target.percentage)) - true.pos
   }
-  assign('compare', df.ohlc, .GlobalEnv)
+  assign('compare', df.ohlc, current.env)
   # compare = df.ohlc
   # df.purchases = df.purchases
   
   if(target.percentage < 0){
     df.purchases$PL = df.purchases$PL * -1
   }
-  assign('df.purchases',df.purchases,.GlobalEnv)
+  assign('df.purchases',df.purchases,current.env)
   
   # df.purchases$PL[df.purchases$PL < (target.percentage*-2.5)] = (target.percentage*-2.5)
   
@@ -2993,12 +2993,12 @@ BacktestSelected <- function(coin, target.percentage, timeframe, confidence.scor
   fee.to.subtract = fee * nrow(df.purchases) * 2
   PL = PL - fee.to.subtract
   
-  assign('sum.percentage',round(PL,3),.GlobalEnv)
+  assign('sum.percentage',round(PL,3),current.env)
   # sum.percentage = round(PL,3)
-  assign('profitable.trades',paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%"), .GlobalEnv)
+  assign('profitable.trades',paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%"), current.env)
   # profitable.trades = paste0(round(profitable.trades / nrow(df.purchases) * 100, 3), "%")
   print(PL)
-  assign("purchase.status", "PURCHASES MADE", .GlobalEnv)
+  assign("purchase.status", "PURCHASES MADE", current.env)
   
   
   # to.return = list(compare = compare,
@@ -3113,6 +3113,11 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     df$MA10 = NA
     df$MA20 = NA
     
+    if(nrow(df) < 21){
+      to.remove = c(to.remove, i)
+      next()
+    }
+    
     for(k in 21:nrow(df)){
       df$MA10[k] = mean(df$Close[k-10:k])
       df$MA20[k] = mean(df$Close[k-20:k])
@@ -3201,7 +3206,7 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     # predict.next = df.testing$predict.next
     # predict.next[is.na(predict.next)] = 0
     
-    if(i == 1){
+    if(i == 1 | !exists("predictions.comb")){
       predictions.comb = data.frame(predict.next)
     }else{
       if(length(predict.next) != nrow(predictions.comb)){
@@ -3213,7 +3218,7 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     }
     
     temp.list = list(df.ohlc = df.ohlc)
-    assign(paste0("temp.list.",df.coins.running$Coins[i]),temp.list,.GlobalEnv)
+    assign(paste0("temp.list.",df.coins.running$Coins[i]),temp.list,current.env)
     
     ohlc.list = c(ohlc.list,temp.list)
     
@@ -3225,8 +3230,14 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
   }else{
     colnames(predictions.comb) = df.coins.running$Coins
   }
+  ind.colnames = which(is.na(colnames(predictions.comb)))
+  
+  if(length(ind.colnames) != 0){
+    predictions.comb = predictions.comb[,-ind.colnames]
+  }
   
   t.predictions.comb = t(predictions.comb)
+
   
   woulda.bought = c()
   confidence.scores = c()
@@ -3241,6 +3252,7 @@ BacktestAutomation <- function(df.coins.running, user, timeframe, fee, confidenc
     confidence.scores = c(confidence.scores, conf)
     woulda.bought = c(woulda.bought,x)
   }
+
   
   df.purchases = ohlc.list[[woulda.bought[1]]][0,]
   
